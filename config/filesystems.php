@@ -43,6 +43,11 @@ return [
 
     'disks' => [
 
+        'paygo' => [
+            'driver' => 'local',
+            'root' => env('DIRECTORY_MONITOR_PATH_BASE', '') //storage_path('app'),
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),

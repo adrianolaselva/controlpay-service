@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Console\Commands\DirectoryMonitorCommand;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -26,6 +27,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command(DirectoryMonitorCommand::class)
+            ->everyMinute()
+            ->before(function(){
+                Log::info(sprintf("[%s] before id: %s", __CLASS__, getmygid()));
+            })->after(function(){
+                Log::info(sprintf("[%s] after id: %s", __CLASS__, getmygid()));
+            });
     }
 }
