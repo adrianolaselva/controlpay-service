@@ -9,7 +9,8 @@
         "laravel/lumen-framework": "5.3.*",
         "vlucas/phpdotenv": "~2.2",
         "league/flysystem": "^1.0",
-        "league/flysystem-aws-s3-v3": "^1.0"
+        "league/flysystem-aws-s3-v3": "^1.0",
+        "adrianolaselva/controlpay-sdk": "0.1.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

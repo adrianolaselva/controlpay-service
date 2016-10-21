@@ -18,7 +18,7 @@ class DirectoryMonitorCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'file-tef-worker:start';
+    protected $signature = 'controlpay-service:start';
 
     /**
      * The console command description.
@@ -76,11 +76,39 @@ class DirectoryMonitorCommand extends Command
     {
         Log::info("monitor start");
         $files = Storage::disk('paygo')->files($this->pathReq);
+
         foreach ($files as $file)
         {
+
             Log::info(sprintf('Processando arquivo: %s', basename($file)));
             try{
-                Storage::disk('paygo')->move($file, sprintf("%s/%s", $this->pathResp, basename($file)));
+
+                $file = new \SplFileObject(
+                    sprintf("%s/%s",Storage::disk('paygo')->getAdapter()->getPathPrefix(),$file)
+                );
+
+                while (!$file->eof())
+                {
+                    list($key, $value) = $file->fgetcsv('=');
+
+                    var_dump($key);
+                    var_dump($value);
+
+                    /**
+                     * TODO: Criar classe para fazer o cast de conteúdo do arquivo "chave=valor" p/ object ControlPay
+                     */
+
+                }
+
+
+//                foreach ($file as $row) {
+//
+//                    //list($animal, $class, $legs) = $row;
+//                    //printf("A %s is a %s with %d legs\n", $animal, $class, $legs);
+//                }
+
+                //var_dump($fileContent);
+                //Storage::disk('paygo')->move($file, sprintf("%s/%s", $this->pathResp, basename($file)));
                 Log::info(sprintf('Processando e movido p/ %s/%s', $this->pathResp, basename($file)));
             }catch (\Exception $ex){
                 Log::error(sprintf('Falha ao processar arquivo %s/%s', $this->pathReq, basename($file)));
