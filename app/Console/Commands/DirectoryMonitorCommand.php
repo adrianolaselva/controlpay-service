@@ -2,9 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Business\CPayVender;
+use App\Helpers\CPayFileHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Integracao\ControlPay;
 
 /**
  * Class DirectoryMonitorCommand
@@ -30,17 +33,37 @@ class DirectoryMonitorCommand extends Command
     /**
      * @var string
      */
-    private $pathReq = '';
+    private $disk = 'local';
 
     /**
      * @var string
      */
-    private $pathResp = '';
+    private $pathConfig = '/conf';
 
     /**
      * @var string
      */
-    private $pathError = '';
+    private $pathReq = '/req';
+
+    /**
+     * @var string
+     */
+    private $pathResp = '/resp';
+
+    /**
+     * @var string
+     */
+    private $pathError = '/error';
+
+    /**
+     * @var string
+     */
+    private $pathProccessed = '/proccessed';
+
+    /**
+     * @var array
+     */
+    private $cPayVender;
 
     /**
      * DirectoryMonitorCommand constructor.
@@ -48,9 +71,22 @@ class DirectoryMonitorCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->pathReq = env('DIRECTORY_MONITOR_PATH_REQ');
-        $this->pathResp = env('DIRECTORY_MONITOR_PATH_RESP');
-        $this->pathError = env('DIRECTORY_MONITOR_PATH_ERROR');
+        $cPayclient = new ControlPay\Client([
+            ControlPay\Constants\ControlPayParameter::CONTROLPAY_HOST => "http://pay2alldemo.azurewebsites.net/webapi/",
+            ControlPay\Constants\ControlPayParameter::CONTROLPAY_TIMEOUT => 30,
+            ControlPay\Constants\ControlPayParameter::CONTROLPAY_KEY => "hnNEn7Q7JapOgJ64qb6fzxex9IkIO%2bxLCGgiPXKjg8gkzR8rsrO9kVK%2fF2PeWNrN7fOOW9%2brCs48luNNPQT30qalcuCrqBP8A2kcgf1fIow%3d"
+        ]);
+        $this->cPayVender = new CPayVender($cPayclient);
+    }
+
+    private function loadConfig()
+    {
+        $files = Storage::disk($this->disk)->files($this->pathConfig);
+
+        foreach ($files as $file)
+        {
+
+        }
     }
 
     /**
@@ -75,45 +111,116 @@ class DirectoryMonitorCommand extends Command
     private function readFiles()
     {
         Log::info("monitor start");
-        $files = Storage::disk('paygo')->files($this->pathReq);
+        $files = Storage::disk($this->disk)->files($this->pathReq);
 
         foreach ($files as $file)
         {
-
-            Log::info(sprintf('Processando arquivo: %s', basename($file)));
-            try{
-
-                $file = new \SplFileObject(
-                    sprintf("%s/%s",Storage::disk('paygo')->getAdapter()->getPathPrefix(),$file)
-                );
-
-                while (!$file->eof())
-                {
-                    list($key, $value) = $file->fgetcsv('=');
-
-                    var_dump($key);
-                    var_dump($value);
-
-                    /**
-                     * TODO: Criar classe para fazer o cast de conteúdo do arquivo "chave=valor" p/ object ControlPay
-                     */
-
-                }
-
-
-//                foreach ($file as $row) {
-//
-//                    //list($animal, $class, $legs) = $row;
-//                    //printf("A %s is a %s with %d legs\n", $animal, $class, $legs);
-//                }
-
-                //var_dump($fileContent);
-                //Storage::disk('paygo')->move($file, sprintf("%s/%s", $this->pathResp, basename($file)));
-                Log::info(sprintf('Processando e movido p/ %s/%s', $this->pathResp, basename($file)));
-            }catch (\Exception $ex){
-                Log::error(sprintf('Falha ao processar arquivo %s/%s', $this->pathReq, basename($file)));
-            }
+            $this->process($file);
         }
         Log::info("monitor end");
     }
+
+    /**
+     * @param $file
+     */
+    private function process($file)
+    {
+        printf("Arquivo: %s %s", basename($file), PHP_EOL);
+
+        try{
+            $data = $this->loadFileContent($file);
+
+            if(!isset($data['api']))
+                throw new \Exception("Função não encontrada!!");
+
+            $responseContent = '';
+            switch (strtolower($data['api']))
+            {
+                case CPayVender::VENDERAPI_VENDER:
+                    $responseContent = $this->cPayVender->vender($data);
+                    break;
+                default:
+                    throw new \Exception("Método {$data['api']} não implementado");
+            }
+
+            $this->fileProccessed($file, $responseContent);
+        }catch (\Exception $ex){
+            $this->fileProccessedError($ex, $file);
+        }
+    }
+
+    /**
+     * @param $file
+     * @param $responseContent
+     */
+    private function fileProccessed($file, $responseContent)
+    {
+        try{
+            $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
+            $responseStatus .= sprintf("response.message=%s", "Dados processados com sucesso", PHP_EOL);
+
+            Storage::disk($this->disk)->put(
+                sprintf("%s/%s", $this->pathResp, basename($file)),
+                $responseStatus . PHP_EOL . $responseContent
+            );
+
+            Storage::disk($this->disk)->move(
+                $file,
+                sprintf("%s/%s_%s", $this->pathProccessed, date('Y-m-d_His'), basename($file))
+            );
+        }catch (\Exception $ex){
+            Log::error("Falha ao mover arquivos");
+        }
+    }
+
+    /**
+     * @param \Exception $ex
+     * @param $file
+     */
+    private function fileProccessedError(\Exception $ex, $file)
+    {
+        try{
+            $resposeContent = sprintf("response.status=%s%s", -1, PHP_EOL);
+            $resposeContent .= sprintf("response.message=%s", "Falha ao processar arquivo", PHP_EOL);
+
+            Storage::disk($this->disk)->put(
+                sprintf("%s/%s", $this->pathResp, basename($file)),
+                $resposeContent
+            );
+
+            Storage::disk($this->disk)->delete($file);
+
+            Storage::disk($this->disk)->move(
+                $file,
+                sprintf("%s/%s_%s", $this->pathError, date('Y-m-d_His'),basename($file))
+            );
+
+        }catch (\Exception $ex){
+            Log::error("Falha ao mover arquivos");
+        }
+    }
+
+    /**
+     * @param $file
+     * @return array
+     */
+    private function loadFileContent($file)
+    {
+        $data = [];
+        Log::info(sprintf('Processando arquivo: %s', basename($file)));
+        try{
+
+            $data = CPayFileHelper::convertFileContentToArray(
+                Storage::disk($this->disk)->getAdapter()->getPathPrefix(),
+                basename($file)
+            );
+
+            Log::info(sprintf('Processando e movido p/ %s/%s', $this->pathProccessed, basename($file)));
+        }catch (\Exception $ex){
+            Log::error(sprintf('Falha ao processar arquivo %s/%s', $this->pathReq, basename($file)));
+        }
+
+        return $data;
+    }
+
 }

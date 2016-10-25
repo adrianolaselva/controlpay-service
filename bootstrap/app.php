@@ -101,4 +101,6 @@ $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
 });
 
+$app->withFacades();
+
 return $app;

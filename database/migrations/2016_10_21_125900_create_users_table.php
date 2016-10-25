@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('api_token');
-            $table->enum('status',['ACTIVE','INACTIVE','BLOCKED']);
+            $table->enum('status',['ACTIVE','INACTIVE']);
             $table->rememberToken();
             $table->timestamps();
         });
