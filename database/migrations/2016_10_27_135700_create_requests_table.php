@@ -15,14 +15,15 @@ class CreateRequestsTable extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('cnpj');
-            $table->string('api');
-            $table->enum('method', [
-                'GET','POST','PUT','DELETE'
-            ]);
-            $table->text('body');
-            $table->text('response_status');
-            $table->text('response_body');
+            $table->integer('file_id')->unsigned();
+            $table->foreign('file_id')->references('id')->on('files');
+            $table->enum('req_method', ['GET','POST','PUT','DELETE']);
+            $table->string('req_host');
+            $table->string('req_api');
+            $table->text('req_params');
+            $table->text('req_body');
+            $table->integer('resp_status');
+            $table->text('resp_body');
             $table->dateTime('created_at')->nullable();
         });
     }

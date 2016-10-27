@@ -10,7 +10,8 @@
         "vlucas/phpdotenv": "~2.2",
         "league/flysystem": "^1.0",
         "league/flysystem-aws-s3-v3": "^1.0",
-        "adrianolaselva/controlpay-sdk": "0.1.*"
+        "adrianolaselva/controlpay-sdk": "0.1.*",
+        "vluzrmos/tinker": "^1.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

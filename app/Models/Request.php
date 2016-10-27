@@ -9,6 +9,7 @@
 namespace App\Models;
 
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,5 +18,26 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Request extends Model
 {
-    protected $attributes = ['cnpj','api', 'method', 'status_code', 'body', 'response_body'];
+    protected $table = 'requests';
+
+    protected $fillable = [
+        'id',
+        'file_id',
+        'req_method',
+        'req_host',
+        'req_api',
+        'req_params',
+        'req_body',
+        'resp_status',
+        'resp_body',
+        'created_at'
+    ];
+
+    public $timestamps = false;
+
+    public function file()
+    {
+        return parent::belongsTo(File::class, 'file_id', 'id');
+    }
+
 }

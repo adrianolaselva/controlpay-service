@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCallbacksTable extends Migration
+class CreateFilesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class CreateCallbacksTable extends Migration
      */
     public function up()
     {
-        Schema::create('callbacks', function (Blueprint $table) {
+        Schema::create('files', function (Blueprint $table) {
             $table->increments('id');
-            $table->text('data');
+            $table->string('identifier');
+            $table->string('reference')->unique();
+            $table->string('name');
+            $table->text('content');
             $table->dateTime('created_at')->nullable();
         });
     }
@@ -27,6 +30,6 @@ class CreateCallbacksTable extends Migration
      */
     public function down()
     {
-        Schema::drop('callbacks');
+        Schema::drop('files');
     }
 }

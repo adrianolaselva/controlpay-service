@@ -33,11 +33,6 @@ class DirectoryMonitorCommand extends Command
     /**
      * @var string
      */
-    private $disk = 'local';
-
-    /**
-     * @var string
-     */
     private $pathConfig = '/conf';
 
     /**
@@ -63,6 +58,11 @@ class DirectoryMonitorCommand extends Command
     /**
      * @var array
      */
+    private $cPayclient;
+
+    /**
+     * @var CPayVender
+     */
     private $cPayVender;
 
     /**
@@ -71,21 +71,21 @@ class DirectoryMonitorCommand extends Command
     public function __construct()
     {
         parent::__construct();
-        $cPayclient = new ControlPay\Client([
-            ControlPay\Constants\ControlPayParameter::CONTROLPAY_HOST => "http://pay2alldemo.azurewebsites.net/webapi/",
-            ControlPay\Constants\ControlPayParameter::CONTROLPAY_TIMEOUT => 30,
-            ControlPay\Constants\ControlPayParameter::CONTROLPAY_KEY => "hnNEn7Q7JapOgJ64qb6fzxex9IkIO%2bxLCGgiPXKjg8gkzR8rsrO9kVK%2fF2PeWNrN7fOOW9%2brCs48luNNPQT30qalcuCrqBP8A2kcgf1fIow%3d"
-        ]);
-        $this->cPayVender = new CPayVender($cPayclient);
+        $this->loadConfig();
     }
 
+    /**
+     * Carrega array contendo configurações a partir de diretório /conf
+     *
+     */
     private function loadConfig()
     {
-        $files = Storage::disk($this->disk)->files($this->pathConfig);
+        $files = Storage::disk(env('STORAGE_CONFIG'))->files($this->pathConfig);
 
         foreach ($files as $file)
         {
-
+            $params = parse_ini_string(Storage::disk(env('STORAGE_CONFIG'))->get($file));
+            $this->cPayclient[basename($file)] = new ControlPay\Client($params);
         }
     }
 
@@ -98,7 +98,7 @@ class DirectoryMonitorCommand extends Command
          * Adaptação para rodar command a cada 2 segundos
          */
         $inverval = 2;
-        for($i = 0; $i < ceil(60/$inverval); $i++)
+        for($i = 0; $i < ceil(1024/$inverval); $i++)
         {
             $this->readFiles();
             sleep($inverval);
@@ -111,10 +111,11 @@ class DirectoryMonitorCommand extends Command
     private function readFiles()
     {
         Log::info("monitor start");
-        $files = Storage::disk($this->disk)->files($this->pathReq);
+        $files = Storage::disk(env('STORAGE_CONFIG'))->files($this->pathReq);
 
         foreach ($files as $file)
         {
+            printf("Arquivo: %s %s", basename($file), PHP_EOL);
             $this->process($file);
         }
         Log::info("monitor end");
@@ -125,15 +126,21 @@ class DirectoryMonitorCommand extends Command
      */
     private function process($file)
     {
-        printf("Arquivo: %s %s", basename($file), PHP_EOL);
-
         try{
             $data = $this->loadFileContent($file);
 
-            if(!isset($data['api']))
-                throw new \Exception("Função não encontrada!!");
+            if(!isset($data['identificador']))
+                throw new \Exception("parâmetro 'identificador' não informado no arquivo!!");
 
-            $responseContent = '';
+            if(!isset($data['api']))
+                throw new \Exception("parâmetro 'api' não informado no arquivo!!");
+
+            if(!isset($this->cPayclient[$data['identificador']]))
+                throw new \Exception("Instância não encontrata para o 'identificador' informado!!");
+
+            $this->cPayVender = new CPayVender($this->cPayclient[$data['identificador']]);
+
+            $responseContent = null;
             switch (strtolower($data['api']))
             {
                 case CPayVender::VENDERAPI_VENDER:
@@ -157,14 +164,14 @@ class DirectoryMonitorCommand extends Command
     {
         try{
             $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
-            $responseStatus .= sprintf("response.message=%s", "Dados processados com sucesso", PHP_EOL);
+            $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
-            Storage::disk($this->disk)->put(
+            Storage::disk(env('STORAGE_CONFIG'))->put(
                 sprintf("%s/%s", $this->pathResp, basename($file)),
-                $responseStatus . PHP_EOL . $responseContent
+                $responseStatus . $responseContent
             );
 
-            Storage::disk($this->disk)->move(
+            Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
                 sprintf("%s/%s_%s", $this->pathProccessed, date('Y-m-d_His'), basename($file))
             );
@@ -181,16 +188,16 @@ class DirectoryMonitorCommand extends Command
     {
         try{
             $resposeContent = sprintf("response.status=%s%s", -1, PHP_EOL);
-            $resposeContent .= sprintf("response.message=%s", "Falha ao processar arquivo", PHP_EOL);
+            $resposeContent .= sprintf("response.message=%s%s", $ex->getMessage(), PHP_EOL);
 
-            Storage::disk($this->disk)->put(
+            Storage::disk(env('STORAGE_CONFIG'))->put(
                 sprintf("%s/%s", $this->pathResp, basename($file)),
                 $resposeContent
             );
 
-            Storage::disk($this->disk)->delete($file);
+            Storage::disk(env('STORAGE_CONFIG'))->delete($file);
 
-            Storage::disk($this->disk)->move(
+            Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
                 sprintf("%s/%s_%s", $this->pathError, date('Y-m-d_His'),basename($file))
             );
@@ -207,15 +214,14 @@ class DirectoryMonitorCommand extends Command
     private function loadFileContent($file)
     {
         $data = [];
-        Log::info(sprintf('Processando arquivo: %s', basename($file)));
+
         try{
 
             $data = CPayFileHelper::convertFileContentToArray(
-                Storage::disk($this->disk)->getAdapter()->getPathPrefix(),
+                sprintf("%s/%s", Storage::disk(env('STORAGE_CONFIG'))->getAdapter()->getPathPrefix(), $this->pathReq),
                 basename($file)
             );
 
-            Log::info(sprintf('Processando e movido p/ %s/%s', $this->pathProccessed, basename($file)));
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao processar arquivo %s/%s', $this->pathReq, basename($file)));
         }

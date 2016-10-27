@@ -4,8 +4,8 @@ namespace App\Business;
 
 use App\Helpers\CPayFileHelper;
 use App\Models\Request;
+use Carbon\Carbon;
 use Integracao\ControlPay;
-use JMS\Serializer\Exception\Exception;
 
 /**
  * Class CPayVender
@@ -21,11 +21,17 @@ class CPayVender
     private $cPayclient;
 
     /**
+     * @var ControlPay\API\VendaApi
+     */
+    private $venderApi;
+
+    /**
      * CPayVender constructor.
      */
     public function __construct(ControlPay\Client $cPayclient)
     {
         $this->cPayclient = $cPayclient;
+        $this->venderApi = new ControlPay\API\VendaApi($this->cPayclient);
     }
 
     /**
@@ -39,28 +45,20 @@ class CPayVender
 
         try{
 
-
             $venderRequest = ControlPay\Helpers\SerializerHelper::denormalize(
                 $data,ControlPay\Contracts\Venda\VenderRequest::class);
 
-            $requestModel = Request::create([
+            $venderResponse = $this->venderApi->vender($venderRequest);
+
+            Request::create([
                 'cnpj' => $data['identificador'],
                 'api' => 'venda/vender',
                 'method' => 'POST',
-                'status_code' => '',
+                'status_code' => $this->venderApi->getResponse()->getStatusCode(),
                 'body' => json_encode($venderRequest, JSON_PRETTY_PRINT),
-                'response_body' => ''
+                'response_body' => json_encode($this->venderApi->getResponse()->json(), JSON_PRETTY_PRINT),
+                'created_at' => Carbon::now()
             ]);
-
-            exit();
-
-            $venderApi = new ControlPay\API\VendaApi($this->cPayclient);
-
-            $venderResponse = $venderApi->vender($venderRequest);
-
-            $requestModel->status_code = $venderApi->response->getStatusCode();
-            $requestModel->response_body = $venderApi->response->json();
-            $requestModel->save();
 
             $responseContent = CPayFileHelper::convertObjectToFile(
                 $venderResponse->getIntencaoVenda(),
@@ -77,9 +75,10 @@ class CPayVender
                     );
                 }
             }
+
         }catch (\Exception $ex){
-            var_dump($ex->getMessage());
-            throw new \Exception("Falha ao enviar requisição", $ex->getCode(), $ex);
+            printf($ex->getMessage());
+            throw new \Exception($ex->getMessage(), $ex->getCode(), $ex);
         }
 
         return $responseContent;
