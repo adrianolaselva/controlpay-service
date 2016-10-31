@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CPayFileHelper;
 use App\Models;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Integracao\ControlPay\API\IntencaoVendaApi;
 use Integracao\ControlPay\Client;
+use Integracao\ControlPay\Contracts\IntencaoVenda\GetByIdResponse;
+use Integracao\ControlPay\Helpers\SerializerHelper;
 
 /**
  * Class CallBackController
@@ -73,6 +76,7 @@ class CallBackController extends Controller
      */
     public function controlPayIntencaoVendaCallBack(Request $request)
     {
+        $responseContent = null;
         try{
 
             $params = $request->query->all();
@@ -112,7 +116,7 @@ class CallBackController extends Controller
                 parse_ini_string(Storage::disk(env('STORAGE_CONFIG'))->get(sprintf("conf/%s", $file->identifier)))
             ));
 
-            $intencaoVendaApi->getById($params['intencaoVendaId']);
+            $getByIdResponse = $intencaoVendaApi->getById($params['intencaoVendaId']);
 
             $file->requests()->create([
                 'req_host' => $intencaoVendaApi->getResponse()->getEffectiveUrl(),
@@ -129,6 +133,10 @@ class CallBackController extends Controller
                 'resp_body' => json_encode($intencaoVendaApi->getResponse()->json(), JSON_PRETTY_PRINT),
                 'created_at' => Carbon::now()
             ]);
+
+            CPayFileHelper::fileCreated("callback_$file->name",
+                CPayFileHelper::exportIntencaoVenda($getByIdResponse->getIntencaoVenda())
+            );
 
             return response()->json([
                 'status' => 0,

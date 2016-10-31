@@ -12,86 +12,58 @@ use Illuminate\Support\Facades\Log;
 use Integracao\ControlPay;
 
 /**
- * Class CPayVender
+ * Class CPayIntencaoVenda
  * @package App\Business
  */
-class CPayVender
+class CPayIntencaoVenda
 {
-    CONST API_VENDA_VENDER = '/venda/vender';
+    CONST API_INTENCAO_VENDA_GET_BY_ID = '/intencaovenda/getbyid';
 
     /**
      * @var ControlPay\Client
      */
     private $cPayclient;
-
     /**
-     * @var ControlPay\API\VendaApi
+     * @var ControlPay\API\IntencaoVendaApi
      */
-    private $venderApi;
-    /**
-     * @var ControlPay\API\PedidoApi
-     */
-    private $pedidoApi;
+    private $intencaoVendaApi;
     /**
      * @var File
      */
     private $fileModel;
 
     /**
-     * CPayVender constructor.
+     * CPayIntencaoVenda constructor.
      */
     public function __construct(ControlPay\Client $cPayclient, File $fileModel)
     {
         $this->cPayclient = $cPayclient;
-        $this->pedidoApi = new ControlPay\API\PedidoApi($this->cPayclient);
-        $this->venderApi = new ControlPay\API\VendaApi($this->cPayclient);
+        $this->intencaoVendaApi = new ControlPay\API\IntencaoVendaApi($this->cPayclient);
         $this->fileModel = $fileModel;
     }
 
     /**
-     * @param array $data
-     * @return string
+     * @param $data
+     * @return null|string
      * @throws \Exception
      */
-    public function vender(array $data)
+    public function carregar($data)
     {
         $responseContent = null;
         $requestModel = null;
 
         try {
 
-            $venderRequest = ControlPay\Helpers\SerializerHelper::denormalize(
-                $data, ControlPay\Contracts\Venda\VenderRequest::class);
+//            if(empty($data['intencaoVendaId']));
+//                throw new \Exception("Parâmetro 'intencaoVendaId' não encontrado");
 
-            $requestModel = $this->saveRequest($venderRequest);
+            $requestModel = $this->saveRequest();
 
-            $this->pedidoApi->insert(
-                (new ControlPay\Contracts\Pedido\InserirRequest())
-                    ->setReferencia($data['referencia'])
-                    ->setUrlRetorno(env('CONTROLPAY_URL_VENDA_CALLBACK'))
-                    ->setValorTotalPedido($venderRequest->getValorTotalVendido())
-                    ->setProdutosPedido($venderRequest->getProdutosVendidos())
-            );
+            $getByIdResponse = $this->intencaoVendaApi->getById($data['intencaoVendaId']);
 
-            $venderResponse = $this->venderApi->vender($venderRequest);
+            $this->saveResponse($requestModel, $this->intencaoVendaApi->getResponse());
 
-            $this->saveResponse($requestModel, $this->venderApi->getResponse());
-
-            $responseContent = CPayFileHelper::exportIntencaoVenda($venderResponse->getIntencaoVenda());
-
-//            $responseContent = CPayFileHelper::convertObjectToFile(
-//                $venderResponse->getIntencaoVenda(),
-//                'data.intencaoVenda.'
-//            );
-//
-//            if (!empty($venderResponse->getIntencaoVenda()->getProdutos())) {
-//                foreach ($venderResponse->getIntencaoVenda()->getProdutos() as $key => $produto) {
-//                    $responseContent .= CPayFileHelper::convertObjectToFile(
-//                        $produto,
-//                        sprintf("data.intencaoVenda.produtos.%s.", $key)
-//                    );
-//                }
-//            }
+            $responseContent = CPayFileHelper::exportIntencaoVenda($getByIdResponse->getIntencaoVenda());
 
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
@@ -106,24 +78,24 @@ class CPayVender
     }
 
     /**
-     * @param ControlPay\Contracts\Venda\VenderRequest $venderRequest
+     * @param array $body
      * @return \Illuminate\Database\Eloquent\Model
      */
-    private function saveRequest(ControlPay\Contracts\Venda\VenderRequest $venderRequest)
+    private function saveRequest($body = [])
     {
         try{
             return $this->fileModel->requests()->create([
                 'req_host' => $this->cPayclient->getParameter(ControlPay\Constants\ControlPayParameterConst::CONTROLPAY_HOST),
-                'req_api' => self::API_VENDA_VENDER,
+                'req_api' => self::API_INTENCAO_VENDA_GET_BY_ID,
                 'req_method' => \Illuminate\Http\Request::METHOD_POST,
                 'req_headers' => json_encode(
-                    $this->venderApi->getHeaders(), JSON_PRETTY_PRINT
+                    $this->intencaoVendaApi->getHeaders(), JSON_PRETTY_PRINT
                 ),
                 'req_params' => json_encode(
-                    $this->venderApi->getQueryParameters(), JSON_PRETTY_PRINT
+                    $this->intencaoVendaApi->getQueryParameters(), JSON_PRETTY_PRINT
                 ),
                 'req_body' => json_encode(
-                    $venderRequest, JSON_PRETTY_PRINT
+                    $body, JSON_PRETTY_PRINT
                 ),
                 'resp_status' => '',
                 'resp_body' => '',
