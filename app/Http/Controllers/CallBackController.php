@@ -39,6 +39,7 @@ class CallBackController extends Controller
                 'message' => 'Registro não encontrado'
             ], Response::HTTP_OK);
 
+        $callBack->headers = json_decode($callBack->headers);
         $callBack->params = json_decode($callBack->params);
         $callBack->body = json_decode($callBack->body);
 
@@ -51,9 +52,14 @@ class CallBackController extends Controller
      */
     public function listAll(Request $request)
     {
-        $callBacks = Models\CallBack::all();
+        $callBacks = Models\CallBack::select()
+            ->skip(empty($request->query('start')) ? 0 : $request->query('start'))
+            ->take(empty($request->query('end')) ? 10 : $request->query('end'))
+            ->get();
+
         foreach ($callBacks as $key => $callBack)
         {
+            $callBacks[$key]->headers = json_decode($callBack->headers);
             $callBacks[$key]->params = json_decode($callBack->params);
             $callBacks[$key]->body = json_decode($callBack->body);
         }
@@ -61,6 +67,10 @@ class CallBackController extends Controller
         return response()->json($callBacks,Response::HTTP_OK);
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function controlPayIntencaoVendaCallBack(Request $request)
     {
         try{
@@ -78,10 +88,17 @@ class CallBackController extends Controller
 
             $file->callBacks()->create([
                 'host' => $request->getClientIp(),
-                'api' => $request->getBasePath(),
+                'api' => $request->getRequestUri(),
                 'method' => $request->getMethod(),
-                'params' => json_encode($params, JSON_PRETTY_PRINT),
-                'body' => json_encode($request->getContent(), JSON_PRETTY_PRINT),
+                'headers' => json_encode(
+                    $request->headers->all(), JSON_PRETTY_PRINT
+                ),
+                'params' => json_encode(
+                    $params, JSON_PRETTY_PRINT
+                ),
+                'body' => json_encode(
+                    $request->getContent(), JSON_PRETTY_PRINT
+                ),
                 'created_at' => Carbon::now()
             ]);
 
@@ -96,14 +113,17 @@ class CallBackController extends Controller
             ));
 
             $intencaoVendaApi->getById($params['intencaoVendaId']);
-            
+
             $file->requests()->create([
                 'req_host' => $intencaoVendaApi->getResponse()->getEffectiveUrl(),
                 'req_api' => '/intencaoVenda/getById',
                 'req_method' => 'POST',
-                'req_params' => json_encode([
-                    'intencaoVendaId' => $params['intencaoVendaId']
-                ]),
+                'req_headers' => json_encode(
+                    $intencaoVendaApi->getHeaders(), JSON_PRETTY_PRINT
+                ),
+                'req_params' => json_encode(
+                    $intencaoVendaApi->getQueryParameters(), JSON_PRETTY_PRINT
+                ),
                 'req_body' => '',
                 'resp_status' => $intencaoVendaApi->getResponse()->getStatusCode(),
                 'resp_body' => json_encode($intencaoVendaApi->getResponse()->json(), JSON_PRETTY_PRINT),

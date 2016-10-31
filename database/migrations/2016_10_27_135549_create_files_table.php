@@ -17,7 +17,7 @@ class CreateFilesTable extends Migration
             $table->increments('id');
             $table->string('identifier');
             $table->string('reference')->unique();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->text('content');
             $table->dateTime('created_at')->nullable();
         });

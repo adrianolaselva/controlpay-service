@@ -26,6 +26,7 @@ class Request extends Model
         'req_method',
         'req_host',
         'req_api',
+        'req_headers',
         'req_params',
         'req_body',
         'resp_status',

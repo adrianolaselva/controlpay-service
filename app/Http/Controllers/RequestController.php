@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: a.moreira
- * Date: 26/10/2016
- * Time: 09:30
- */
 
 namespace App\Http\Controllers;
 
@@ -30,6 +24,8 @@ class RequestController extends Controller
                 'message' => 'Registro não encontrado'
             ], Response::HTTP_OK);
 
+        $request->req_headers = json_decode($request->req_headers);
+        $request->req_params = json_decode($request->req_params);
         $request->req_body = json_decode($request->req_body);
         $request->resp_body = json_decode($request->resp_body);
 
@@ -42,10 +38,15 @@ class RequestController extends Controller
      */
     public function listAll(Request $request)
     {
-        $requests = Models\Request::all();
+        $requests = Models\Request::select()
+            ->skip(empty($request->query('start')) ? 0 : $request->query('start'))
+            ->take(empty($request->query('end')) ? 10 : $request->query('end'))
+            ->get();
 
         foreach ($requests as $key => $request)
         {
+            $requests[$key]->req_headers = json_decode($request->req_headers);
+            $requests[$key]->req_params = json_decode($request->req_params);
             $requests[$key]->req_body = json_decode($request->req_body);
             $requests[$key]->resp_body = json_decode($request->resp_body);
         }

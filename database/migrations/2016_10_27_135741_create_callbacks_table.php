@@ -20,6 +20,7 @@ class CreateCallbacksTable extends Migration
             $table->enum('method', ['GET','POST','PUT','DELETE']);
             $table->string('host');
             $table->string('api');
+            $table->text('headers');
             $table->text('params');
             $table->text('body');
             $table->dateTime('created_at')->nullable();

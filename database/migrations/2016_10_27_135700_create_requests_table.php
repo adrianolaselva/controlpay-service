@@ -20,6 +20,7 @@ class CreateRequestsTable extends Migration
             $table->enum('req_method', ['GET','POST','PUT','DELETE']);
             $table->string('req_host');
             $table->string('req_api');
+            $table->text('req_headers');
             $table->text('req_params');
             $table->text('req_body');
             $table->integer('resp_status');

@@ -23,17 +23,17 @@ $app->group(['prefix' => '/v1', 'middleware' => 'auth'], function() use ($app) {
     $app->get('requests/{id}', 'App\Http\Controllers\RequestController@load');
     $app->get('requests', 'App\Http\Controllers\RequestController@listAll');
 
-    $app->post('file/upload/{path}/{name}', 'App\Http\Controllers\FileController@upload');
-    $app->post('file/{path}/{name}', 'App\Http\Controllers\FileController@add');
-    $app->get('file/{path}/{name}', 'App\Http\Controllers\FileController@load');
-    $app->delete('file/{path}/{name}', 'App\Http\Controllers\FileController@delete');
+    $app->get('files/{id}', 'App\Http\Controllers\FileController@load');
+    $app->get('files', 'App\Http\Controllers\FileController@listAll');
+    $app->get('files/download/{path}/{name}', 'App\Http\Controllers\FileController@download');
+    $app->post('files/{path}/{name}', 'App\Http\Controllers\FileController@add');
+    $app->post('files/upload/{path}/{name}', 'App\Http\Controllers\FileController@upload');
+    $app->delete('files/{path}/{name}', 'App\Http\Controllers\FileController@delete');
 
 });
 
 $app->group(['prefix' => '/v1'], function() use ($app) {
-
     $app->get('callbacks/controlpay/intencaovendacallback', 'App\Http\Controllers\CallBackController@controlPayIntencaoVendaCallBack');
-
 });
 
 

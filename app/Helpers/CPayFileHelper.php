@@ -42,6 +42,12 @@ class CPayFileHelper
                 continue;
             }
 
+            if($key == 'referencia')
+            {
+                $data['referencia'] = $value;
+                continue;
+            }
+
             $param = explode('.',$key);
             if(isset($param[0]) && $param[0] == 'param')
             {

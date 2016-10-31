@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use App\Models;
 
 /**
  * Class FileController
@@ -15,9 +16,45 @@ class FileController extends Controller
 {
 
     /**
-     * @var string
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
      */
-    private $disk = 'local';
+    public function load(Request $request, $id)
+    {
+        $file = Models\File::find($id);
+
+        if(!$file)
+            return response()->json([
+                'status' => -1,
+                'message' => 'Registro não encontrado'
+            ], Response::HTTP_OK);
+
+        $file->content = json_decode($file->content);
+
+        return response()->json($file, Response::HTTP_OK);
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function listAll(Request $request)
+    {
+        $files = Models\File::select()
+            ->skip(empty($request->query('start')) ? 0 : $request->query('start'))
+            ->take(empty($request->query('end')) ? 10 : $request->query('end'))
+            ->get();
+
+        foreach ($files as $key => $file)
+        {
+            $files[$key]->content = json_decode($file->content);
+        }
+
+        return response()->json($files, Response::HTTP_OK);
+    }
+
+
 
     /**
      * @param Request $request
@@ -25,12 +62,19 @@ class FileController extends Controller
      * @param $name
      * @return Response
      */
-    public function load(Request $request, $path, $name)
+    public function download(Request $request, $path, $name)
     {
         if(!Storage::disk(env('STORAGE_CONFIG'))->exists(sprintf("%s/%s", $path, $name)))
             return response('Arquivo não encontrado', Response::HTTP_BAD_REQUEST);
 
-        return Storage::disk(env('STORAGE_CONFIG'))->get(sprintf("%s/%s", $path, $name), $request->getContent());
+        return response()->download(
+            Storage::disk(env('STORAGE_CONFIG'))
+                ->getDriver()
+                ->getAdapter()
+                ->applyPathPrefix(sprintf("%s/%s", $path, $name), $name, [
+                    'Content-Type' => 'text/plain'
+                ])
+        );
     }
 
     /**

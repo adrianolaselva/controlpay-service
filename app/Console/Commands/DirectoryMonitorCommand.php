@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Business\CPayVender;
 use App\Helpers\CPayFileHelper;
+use App\Models\File;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -110,15 +112,12 @@ class DirectoryMonitorCommand extends Command
      */
     private function readFiles()
     {
-        Log::info("monitor start");
         $files = Storage::disk(env('STORAGE_CONFIG'))->files($this->pathReq);
 
         foreach ($files as $file)
         {
-            printf("Arquivo: %s %s", basename($file), PHP_EOL);
             $this->process($file);
         }
-        Log::info("monitor end");
     }
 
     /**
@@ -138,12 +137,28 @@ class DirectoryMonitorCommand extends Command
             if(!isset($this->cPayclient[$data['identificador']]))
                 throw new \Exception("Instância não encontrata para o 'identificador' informado!!");
 
-            $this->cPayVender = new CPayVender($this->cPayclient[$data['identificador']]);
+            if(!empty(File::where('reference', $data['referencia'])->first()))
+                throw new \Exception("Referência {$data['referencia']} já utilizada");
+
+            if(!empty(File::where('name', basename($file))->first()))
+                throw new \Exception(sprintf("Arquivo nome %s já utilizada", basename($file)));
+
+            printf("Processando arquivo %s => ref: %s %s", basename($file), $data['referencia'], PHP_EOL);
+
+            $fileModel = File::create([
+                'identifier' => $data['identificador'],
+                'reference' => $data['referencia'],
+                'name' => basename($file),
+                'content' => json_encode($data, JSON_PRETTY_PRINT),
+                'created_at' => Carbon::now()
+            ]);
+
+            $this->cPayVender = new CPayVender($this->cPayclient[$data['identificador']], $fileModel);
 
             $responseContent = null;
             switch (strtolower($data['api']))
             {
-                case CPayVender::VENDERAPI_VENDER:
+                case CPayVender::API_VENDA_VENDER:
                     $responseContent = $this->cPayVender->vender($data);
                     break;
                 default:
@@ -152,6 +167,7 @@ class DirectoryMonitorCommand extends Command
 
             $this->fileProccessed($file, $responseContent);
         }catch (\Exception $ex){
+            Log::info($ex->getMessage());
             $this->fileProccessedError($ex, $file);
         }
     }
@@ -176,7 +192,7 @@ class DirectoryMonitorCommand extends Command
                 sprintf("%s/%s_%s", $this->pathProccessed, date('Y-m-d_His'), basename($file))
             );
         }catch (\Exception $ex){
-            Log::error("Falha ao mover arquivos");
+            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]', $this->pathReq, basename($file), $ex->getMessage()));
         }
     }
 
@@ -195,15 +211,13 @@ class DirectoryMonitorCommand extends Command
                 $resposeContent
             );
 
-            Storage::disk(env('STORAGE_CONFIG'))->delete($file);
-
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
                 sprintf("%s/%s_%s", $this->pathError, date('Y-m-d_His'),basename($file))
             );
 
         }catch (\Exception $ex){
-            Log::error("Falha ao mover arquivos");
+            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]', $this->pathReq, basename($file), $ex->getMessage()));
         }
     }
 
@@ -223,7 +237,7 @@ class DirectoryMonitorCommand extends Command
             );
 
         }catch (\Exception $ex){
-            Log::error(sprintf('Falha ao processar arquivo %s/%s', $this->pathReq, basename($file)));
+            Log::error(sprintf('Falha ao processar arquivo %s/%s => [%s]', $this->pathReq, basename($file)), $ex->getMessage());
         }
 
         return $data;
