@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "adrianolaselva/controlpay-sdk",
-            "version": "0.1.9",
+            "version": "0.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adrianolaselva/controlpay-sdk.git",
-                "reference": "939420d3edda0377b69692381fc80d0cf55cf055"
+                "reference": "2f2450d447b358ed29a633c2e93c3e5faf32b2eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adrianolaselva/controlpay-sdk/zipball/939420d3edda0377b69692381fc80d0cf55cf055",
-                "reference": "939420d3edda0377b69692381fc80d0cf55cf055",
+                "url": "https://api.github.com/repos/adrianolaselva/controlpay-sdk/zipball/2f2450d447b358ed29a633c2e93c3e5faf32b2eb",
+                "reference": "2f2450d447b358ed29a633c2e93c3e5faf32b2eb",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                     "email": "adrianolaselva@gmail.com"
                 }
             ],
-            "time": "2016-11-04 12:03:20"
+            "time": "2016-11-04 18:53:55"
         },
         {
             "name": "aws/aws-sdk-php",

@@ -130,7 +130,8 @@ class DirectoryMonitorCommand extends Command
             if(!empty(File::where('name', basename($file))->first()))
                 throw new \Exception(sprintf("Arquivo nome %s já utilizada", basename($file)));
 
-            printf("Processando arquivo %s => ref: %s %s", basename($file), $data['referencia'], PHP_EOL);
+            Log::info(sprintf("Processando arquivo %s => ref: %s", basename($file), $data['referencia']));
+            //printf("Processando arquivo %s => ref: %s %s", basename($file), $data['referencia'], PHP_EOL);
 
             $fileModel = File::create([
                 'identifier' => $data['identificador'],
@@ -150,6 +151,10 @@ class DirectoryMonitorCommand extends Command
                 case CPayIntencaoVenda::API_INTENCAO_VENDA_GET_BY_ID:
                     $responseContent = (new CPayIntencaoVenda($this->cPayclient[$data['identificador']], $fileModel))
                         ->carregar($data);
+                    break;
+                case CPayVender::API_VENDA_CANCELAR:
+                    $responseContent = (new CPayVender($this->cPayclient[$data['identificador']], $fileModel))
+                        ->cancelarVenda($data);
                     break;
                 default:
                     throw new \Exception("Método {$data['api']} não implementado");

@@ -74,6 +74,11 @@ class TestCase extends Laravel\Lumen\Testing\TestCase
             env('TEST_CONTROLPAY_DEFAULT_FORMA_AGUARDA_TEF'),
             PHP_EOL
         );
+        $sdkFileConfig .=  sprintf('%s=%s%s',
+            \Integracao\ControlPay\Constants\ControlPayParameterConst::CONTROLPAY_DEFAULT_SENHA_TECNICA,
+            env('TEST_CONTROLPAY_DEFAULT_SENHA_TECNICA'),
+            PHP_EOL
+        );
 
         $pathConf = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_CONFIG, env('TEST_CONTROLPAY_USER'));
         \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathConf, $sdkFileConfig);

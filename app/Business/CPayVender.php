@@ -19,6 +19,8 @@ class CPayVender
 {
     CONST API_VENDA_VENDER = '/venda/vender';
 
+    CONST API_VENDA_CANCELAR = '/venda/cancelarvenda';
+
     /**
      * @var ControlPay\Client
      */
@@ -65,15 +67,7 @@ class CPayVender
 
             $requestModel = $this->saveRequest($venderRequest);
 
-            $inserirResponse = $this->pedidoApi->insert(
-                (new ControlPay\Contracts\Pedido\InserirRequest())
-                    ->setReferencia($data['referencia'])
-                    ->setUrlRetorno(env('CONTROLPAY_URL_VENDA_CALLBACK'))
-                    ->setValorTotalPedido($venderRequest->getValorTotalVendido())
-                    ->setProdutosPedido($venderRequest->getProdutosVendidos())
-            );
-
-            $venderRequest->setPedidoId($inserirResponse->getPedido()->getId());
+            $venderRequest->setReferencia($data['referencia']);
 
             $venderResponse = $this->venderApi->vender($venderRequest);
 
@@ -93,10 +87,46 @@ class CPayVender
     }
 
     /**
+     * @param array $data
+     * @return string
+     * @throws \Exception
+     */
+    public function cancelarVenda(array $data)
+    {
+        $responseContent = null;
+        $requestModel = null;
+
+        try {
+
+            $cancelarVendaRequest = ControlPay\Helpers\SerializerHelper::denormalize(
+                $data, ControlPay\Contracts\Venda\CancelarVendaRequest::class);
+
+            $requestModel = $this->saveRequest($cancelarVendaRequest);
+
+            $cancelarVendaRequest->setReferencia($data['referencia']);
+
+            $cancelarVendaResponse = $this->venderApi->cancelarVenda($cancelarVendaRequest);
+
+            $this->saveResponse($requestModel, $this->venderApi->getResponse());
+
+            $responseContent = CPayFileHelper::exportIntencaoVenda($cancelarVendaResponse->getIntencaoVenda());
+        }catch (RequestException $ex){
+            Log::error($ex->getMessage());
+            $this->saveResponseException($requestModel, $ex);
+            throw new \Exception($ex->getMessage(), $ex->getCode(), $ex);
+        }catch (\Exception $ex){
+            Log::error($ex->getMessage());
+            throw new \Exception($ex->getMessage(), $ex->getCode(), $ex);
+        }
+
+        return $responseContent;
+    }
+
+    /**
      * @param ControlPay\Contracts\Venda\VenderRequest $venderRequest
      * @return \Illuminate\Database\Eloquent\Model
      */
-    private function saveRequest(ControlPay\Contracts\Venda\VenderRequest $venderRequest)
+    private function saveRequest($venderRequest)
     {
         try{
             return $this->fileModel->requests()->create([

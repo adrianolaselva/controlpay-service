@@ -97,9 +97,6 @@ class DirectoryMonitorCommandTest extends TestCase
             'data.intencaoVenda.data' => null,
             'data.intencaoVenda.valorOriginal' => null,
             'data.intencaoVenda.terminal.id' => null,
-            'data.intencaoVenda.pedido.id' => null,
-            'data.intencaoVenda.pedido.referencia' => null,
-            'data.intencaoVenda.pedido.valor' => null,
             'data.intencaoVenda.formaPagamento.id' => null,
         ];
 
@@ -150,9 +147,9 @@ class DirectoryMonitorCommandTest extends TestCase
     /**
      * Simula callback de resposta no controlpay
      */
-    public function testConsultaTransacaoPorIntencaoVendaId()
+    public function testConsultaIntencaoVendaPorId()
     {
-        self::$referenciaLocal .= '_cons';
+        self::$referenciaLocal .= '_cons_id';
         $pathReq = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
         $pathResp = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
 
@@ -186,8 +183,124 @@ class DirectoryMonitorCommandTest extends TestCase
             'data.intencaoVenda.token' => null,
             'data.intencaoVenda.data' => null,
             'data.intencaoVenda.valorOriginal' => null,
-            'data.intencaoVenda.pedido.id' => null,
-            'data.intencaoVenda.pedido.referencia' => null,
+        ];
+
+        while (!$file->eof())
+        {
+            $row = $file->fgetcsv('=');
+
+            if(empty($row[0]) & empty($row[1]))
+                continue;
+
+            list($key, $value) = $row;
+
+            if(in_array($key, array_keys($resultParams)))
+                $resultParams[$key] = $value;
+        }
+
+        foreach ($resultParams as $key => $param)
+            $this->assertNotNull($param, sprintf("dado do atributo %s não foi encontrado na resposta", $key));
+
+    }
+
+    /**
+     * Simula callback de resposta no controlpay
+     */
+    public function testConsultaIntencaoVendaPorReferencia()
+    {
+        self::$referenciaLocal .= '_cons_ref';
+        $pathReq = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
+        $pathResp = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
+
+        $consultaTransacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= sprintf('referencia=%s', self::$referenciaLocal) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= 'api=/intencaovenda/getbyid' . PHP_EOL;
+        $consultaTransacaoFileSemTef .= sprintf('param.intencaoVendaId=%s', self::$intencaoVendaId) . PHP_EOL;
+
+        \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathReq, $consultaTransacaoFileSemTef);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathReq));
+
+        \Illuminate\Support\Facades\Artisan::call('controlpay-service:start', [
+            'minutes' => 6
+        ]);
+
+        $resultAsText = \Illuminate\Support\Facades\Artisan::output();
+        $this->assertEmpty($resultAsText);
+        $this->assertTrue(true);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathResp));
+
+        $file = new \SplFileObject(sprintf("%s/%s/%s",\App\Helpers\CPayFileHelper::getBaseDirectory(), \App\Helpers\CPayFileHelper::PATH_RESP, basename($pathResp)));
+
+        /**
+         * Valida atributos obrigatórios na resposta
+         */
+        $resultParams = [
+            'response.status' => null,
+            'data.intencaoVenda.id' => null,
+            'data.intencaoVenda.token' => null,
+            'data.intencaoVenda.data' => null,
+            'data.intencaoVenda.valorOriginal' => null,
+        ];
+
+        while (!$file->eof())
+        {
+            $row = $file->fgetcsv('=');
+
+            if(empty($row[0]) & empty($row[1]))
+                continue;
+
+            list($key, $value) = $row;
+
+            if(in_array($key, array_keys($resultParams)))
+                $resultParams[$key] = $value;
+        }
+
+        foreach ($resultParams as $key => $param)
+            $this->assertNotNull($param, sprintf("dado do atributo %s não foi encontrado na resposta", $key));
+
+    }
+
+    /**
+     * Simula callback de resposta no controlpay
+     */
+    public function testCancelarIntencaoVenda()
+    {
+        self::$referenciaLocal .= '_canc';
+        $pathReq = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
+        $pathResp = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
+
+        $consultaTransacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= sprintf('referencia=%s', self::$referenciaLocal) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= 'api=/venda/cancelarvenda' . PHP_EOL;
+        //$consultaTransacaoFileSemTef .= sprintf('param.intencaoVendaId=%s', self::$intencaoVendaId) . PHP_EOL;
+
+        \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathReq, $consultaTransacaoFileSemTef);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathReq));
+
+        \Illuminate\Support\Facades\Artisan::call('controlpay-service:start', [
+            'minutes' => 6
+        ]);
+
+        $resultAsText = \Illuminate\Support\Facades\Artisan::output();
+        $this->assertEmpty($resultAsText);
+        $this->assertTrue(true);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathResp));
+
+        $file = new \SplFileObject(sprintf("%s/%s/%s",\App\Helpers\CPayFileHelper::getBaseDirectory(), \App\Helpers\CPayFileHelper::PATH_RESP, basename($pathResp)));
+
+        /**
+         * Valida atributos obrigatórios na resposta
+         */
+        $resultParams = [
+            'response.status' => null,
+//            'data.intencaoVenda.id' => null,
+//            'data.intencaoVenda.token' => null,
+//            'data.intencaoVenda.data' => null,
+//            'data.intencaoVenda.valorOriginal' => null,
         ];
 
         while (!$file->eof())
