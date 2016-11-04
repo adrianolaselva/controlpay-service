@@ -8,6 +8,7 @@ use App\Helpers\CPayFileHelper;
 use App\Models\File;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Integracao\ControlPay;
@@ -24,7 +25,7 @@ class DirectoryMonitorCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'controlpay-service:start';
+    protected $signature = 'controlpay-service:start {minutes}';
 
     /**
      * The console command description.
@@ -77,11 +78,16 @@ class DirectoryMonitorCommand extends Command
      */
     public function handle()
     {
+        $minutes = $this->argument('minutes');
+
+        if(empty($minutes))
+            $minutes = 60;
+
         /**
          * Adaptação para rodar command a cada 2 segundos
          */
         $inverval = 2;
-        for($i = 0; $i < ceil(1024/$inverval); $i++)
+        for($i = 0; $i < ceil($minutes/$inverval); $i++)
         {
             $this->readFiles();
             sleep($inverval);

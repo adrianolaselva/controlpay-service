@@ -126,9 +126,9 @@ class FileController extends Controller
 
     /**
      * @param Request $request
-     * @param $path
+     * @return mixed
      */
-    public function upload(Request $request, $path, $name)
+    public function upload(Request $request, $path)
     {
 
         if(!$request->hasFile('arquivo'))
@@ -139,19 +139,19 @@ class FileController extends Controller
 
         $file = $request->file('arquivo');
 
-        if(Storage::disk(env('STORAGE_CONFIG'))->exists(sprintf("%s/%s", $path, $name)))
+        if(Storage::disk(env('STORAGE_CONFIG'))->exists(sprintf("%s/%s", $path, $file->getClientOriginalName())))
             return response()->json([
                 'status' => -1,
                 'message' => "Já contém um arquivo com o mesmo nome no path $path/"
             ], Response::HTTP_OK);
 
-        if(Storage::disk(env('STORAGE_CONFIG'))->exists(sprintf("%s/%s", "resp", $name)))
+        if(Storage::disk(env('STORAGE_CONFIG'))->exists(sprintf("%s/%s", "resp", $file->getClientOriginalName())))
             return response()->json([
                 'status' => -1,
                 'message' => "Já contém um arquivo com o mesmo nome no path resp/"
             ], Response::HTTP_OK);
 
-        Storage::disk(env('STORAGE_CONFIG'))->put(sprintf("%s/%s", $path, $name), File::get($file));
+        Storage::disk(env('STORAGE_CONFIG'))->put(sprintf("%s/%s", $path, $file->getClientOriginalName()), File::get($file));
 
         return response()->json([
             'status' => 0,

@@ -38,8 +38,8 @@ class CPayIntencaoVenda
     public function __construct(ControlPay\Client $cPayclient, File $fileModel)
     {
         $this->cPayclient = $cPayclient;
-        $this->intencaoVendaApi = new ControlPay\API\IntencaoVendaApi($this->cPayclient);
         $this->fileModel = $fileModel;
+        $this->intencaoVendaApi = new ControlPay\API\IntencaoVendaApi($this->cPayclient);
     }
 
     /**

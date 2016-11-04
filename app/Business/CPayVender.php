@@ -43,9 +43,9 @@ class CPayVender
     public function __construct(ControlPay\Client $cPayclient, File $fileModel)
     {
         $this->cPayclient = $cPayclient;
+        $this->fileModel = $fileModel;
         $this->pedidoApi = new ControlPay\API\PedidoApi($this->cPayclient);
         $this->venderApi = new ControlPay\API\VendaApi($this->cPayclient);
-        $this->fileModel = $fileModel;
     }
 
     /**
@@ -65,7 +65,7 @@ class CPayVender
 
             $requestModel = $this->saveRequest($venderRequest);
 
-            $this->pedidoApi->insert(
+            $inserirResponse = $this->pedidoApi->insert(
                 (new ControlPay\Contracts\Pedido\InserirRequest())
                     ->setReferencia($data['referencia'])
                     ->setUrlRetorno(env('CONTROLPAY_URL_VENDA_CALLBACK'))
@@ -73,26 +73,13 @@ class CPayVender
                     ->setProdutosPedido($venderRequest->getProdutosVendidos())
             );
 
+            $venderRequest->setPedidoId($inserirResponse->getPedido()->getId());
+
             $venderResponse = $this->venderApi->vender($venderRequest);
 
             $this->saveResponse($requestModel, $this->venderApi->getResponse());
 
             $responseContent = CPayFileHelper::exportIntencaoVenda($venderResponse->getIntencaoVenda());
-
-//            $responseContent = CPayFileHelper::convertObjectToFile(
-//                $venderResponse->getIntencaoVenda(),
-//                'data.intencaoVenda.'
-//            );
-//
-//            if (!empty($venderResponse->getIntencaoVenda()->getProdutos())) {
-//                foreach ($venderResponse->getIntencaoVenda()->getProdutos() as $key => $produto) {
-//                    $responseContent .= CPayFileHelper::convertObjectToFile(
-//                        $produto,
-//                        sprintf("data.intencaoVenda.produtos.%s.", $key)
-//                    );
-//                }
-//            }
-
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
             $this->saveResponseException($requestModel, $ex);

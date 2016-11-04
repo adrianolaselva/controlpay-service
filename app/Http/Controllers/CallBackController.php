@@ -13,12 +13,11 @@ use App\Models;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Integracao\ControlPay\API\IntencaoVendaApi;
 use Integracao\ControlPay\Client;
-use Integracao\ControlPay\Contracts\IntencaoVenda\GetByIdResponse;
-use Integracao\ControlPay\Helpers\SerializerHelper;
 
 /**
  * Class CallBackController
@@ -146,7 +145,8 @@ class CallBackController extends Controller
             Log::error($ex->getMessage());
             return response()->json([
                 'status' => -1,
-                'message' => $ex->getMessage()
+                'message' => $ex->getMessage(),
+                'stackTrace' => $ex->getTraceAsString()
             ],Response::HTTP_BAD_REQUEST);
         }
     }

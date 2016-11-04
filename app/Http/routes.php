@@ -12,7 +12,7 @@
 */
 
 $app->get('/', function () use ($app) {
-    return "Componente de integração ControlPay (File change) v0.1.0";
+    return $app->version();
 });
 
 $app->group(['prefix' => '/v1', 'middleware' => 'auth'], function() use ($app) {
@@ -26,8 +26,8 @@ $app->group(['prefix' => '/v1', 'middleware' => 'auth'], function() use ($app) {
     $app->get('files/{id}', 'App\Http\Controllers\FileController@load');
     $app->get('files', 'App\Http\Controllers\FileController@listAll');
     $app->get('files/download/{path}/{name}', 'App\Http\Controllers\FileController@download');
-    $app->post('files/{path}/{name}', 'App\Http\Controllers\FileController@add');
-    $app->post('files/upload/{path}/{name}', 'App\Http\Controllers\FileController@upload');
+    $app->post('files/add/{path}/{name}', 'App\Http\Controllers\FileController@add');
+    $app->post('files/upload/{path}', 'App\Http\Controllers\FileController@upload');
     $app->delete('files/{path}/{name}', 'App\Http\Controllers\FileController@delete');
 
 });

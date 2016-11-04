@@ -33,9 +33,15 @@ class CPayFileHelper
 
         $file = new \SplFileObject(sprintf("%s/%s",$path, $fileName));
 
+
         while (!$file->eof())
         {
-            list($key, $value) = $file->fgetcsv('=');
+            $row = $file->fgetcsv('=');
+
+            if(empty($row[0]) & empty($row[1]))
+                continue;
+
+            list($key, $value) = $row;
 
             if($key == 'api')
             {
@@ -101,12 +107,12 @@ class CPayFileHelper
             $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
             Storage::disk(env('STORAGE_CONFIG'))->put(
-                sprintf("%s/%s", CPayFileHelper::PATH_RESP, basename($file)),
+                sprintf("%s/%s", self::PATH_RESP, basename($file)),
                 $responseStatus . $responseContent
             );
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
-                CPayFileHelper::PATH_REQ, basename($file), $ex->getMessage()));
+                self::PATH_REQ, basename($file), $ex->getMessage()));
         }
     }
 
@@ -121,17 +127,17 @@ class CPayFileHelper
             $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
             Storage::disk(env('STORAGE_CONFIG'))->put(
-                sprintf("%s/%s", CPayFileHelper::PATH_RESP, basename($file)),
+                sprintf("%s/%s", self::PATH_RESP, basename($file)),
                 $responseStatus . $responseContent
             );
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
-                sprintf("%s/%s_%s", CPayFileHelper::PATH_PROCCESSED, date('Y-m-d_His'), basename($file))
+                sprintf("%s/%s_%s", self::PATH_PROCCESSED, date('Y-m-d_His'), basename($file))
             );
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
-                CPayFileHelper::PATH_REQ, basename($file), $ex->getMessage()));
+                self::PATH_REQ, basename($file), $ex->getMessage()));
         }
     }
 
@@ -146,18 +152,19 @@ class CPayFileHelper
             $resposeContent .= sprintf("response.message=%s%s", $ex->getMessage(), PHP_EOL);
 
             Storage::disk(env('STORAGE_CONFIG'))->put(
-                sprintf("%s/%s", CPayFileHelper::PATH_RESP, basename($file)),
+                sprintf("%s/%s", self::PATH_RESP, basename($file)),
                 $resposeContent
             );
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
-                sprintf("%s/%s_%s", CPayFileHelper::PATH_ERROR, date('Y-m-d_His'),basename($file))
+                sprintf("%s/%s_%s", self::PATH_ERROR, date('Y-m-d_His'),basename($file))
             );
 
         }catch (\Exception $ex){
+            var_dump($ex->getMessage());
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
-                PayFileHelper::PATH_REQ, basename($file), $ex->getMessage()));
+                self::PATH_REQ, basename($file), $ex->getMessage()));
         }
     }
 
@@ -170,16 +177,10 @@ class CPayFileHelper
         $data = [];
 
         try{
-
-            $data = CPayFileHelper::convertFileContentToArray(
-                sprintf("%s/%s", Storage::disk(env('STORAGE_CONFIG'))->getAdapter()->getPathPrefix(),
-                    CPayFileHelper::PATH_REQ),
-                basename($file)
-            );
-
+            $data = self::convertFileContentToArray(sprintf("%s%s", self::getBaseDirectory(), self::PATH_REQ), basename($file));
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao processar arquivo %s/%s => [%s]',
-                CPayFileHelper::PATH_REQ, basename($file)), $ex->getMessage());
+                self::PATH_REQ, basename($file)), $ex->getMessage());
         }
 
         return $data;
@@ -203,15 +204,38 @@ class CPayFileHelper
                 'data.intencaoVenda.'
             );
 
-            $responseContent .= self::convertObjectToFile(
-                $intencaoVenda->getIntencaoVendaStatus(),
-                'data.intencaoVenda.status.'
-            );
+            if(!empty($intencaoVenda->getIntencaoVendaStatus()))
+                $responseContent .= self::convertObjectToFile(
+                    $intencaoVenda->getIntencaoVendaStatus(),
+                    'data.intencaoVenda.intencaoVendaStatus.'
+                );
 
-            $responseContent .= self::convertObjectToFile(
-                $intencaoVenda->getFormaPagamento(),
-                'data.intencaoVenda.formaPagamento.'
-            );
+            if(!empty($intencaoVenda->getFormaPagamento()))
+            {
+                $responseContent .= self::convertObjectToFile(
+                    $intencaoVenda->getFormaPagamento(),
+                    'data.intencaoVenda.formaPagamento.'
+                );
+
+                if(!empty($intencaoVenda->getFormaPagamento()->getFluxoPagamento()))
+                    $responseContent .= self::convertObjectToFile(
+                        $intencaoVenda->getFormaPagamento()->getFluxoPagamento(),
+                        'data.intencaoVenda.formaPagamento.fluxoPagamento.'
+                    );
+            }
+
+
+            if(!empty($intencaoVenda->getTerminal()))
+                $responseContent .= self::convertObjectToFile(
+                    $intencaoVenda->getTerminal(),
+                    'data.intencaoVenda.terminal.'
+                );
+
+            if(!empty($intencaoVenda->getPedido()))
+                $responseContent .= self::convertObjectToFile(
+                    $intencaoVenda->getPedido(),
+                    'data.intencaoVenda.pedido.'
+                );
 
             if (!empty($intencaoVenda->getProdutos())) {
                 foreach ($intencaoVenda->getProdutos() as $key => $produto) {
@@ -226,6 +250,13 @@ class CPayFileHelper
         }catch (\Exception $ex){
             Log::error(sprintf("Falha ao exportar arquivo fn: [%s]", __FUNCTION__));
         }
+    }
+
+    public static function getBaseDirectory()
+    {
+        return sprintf("%s/app",
+            dirname(Storage::disk(env('STORAGE_CONFIG'))->getAdapter()->getPathPrefix())
+        );
     }
 
 }
