@@ -82,5 +82,7 @@ class TestCase extends Laravel\Lumen\Testing\TestCase
 
         $pathConf = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_CONFIG, env('TEST_CONTROLPAY_USER'));
         \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathConf, $sdkFileConfig);
+
+        self::$user = basename($pathConf);
     }
 }
