@@ -1,5 +1,6 @@
 {
     "name": "laravel/lumen",
+    "version": "0.1.0",
     "description": "The Laravel Lumen Framework.",
     "keywords": ["framework", "laravel", "lumen"],
     "license": "MIT",
