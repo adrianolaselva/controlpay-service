@@ -25,7 +25,7 @@ class DirectoryMonitorCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'controlpay-service:start {minutes}';
+    protected $signature = 'controlpay-service:start {minutes?}';
 
     /**
      * The console command description.
@@ -78,7 +78,9 @@ class DirectoryMonitorCommand extends Command
      */
     public function handle()
     {
-        $minutes = $this->argument('minutes');
+        $arguments = $this->arguments();
+
+        $minutes = $arguments['minutes'];
 
         if(empty($minutes))
             $minutes = 60;
