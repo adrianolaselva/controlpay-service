@@ -18,8 +18,10 @@ before_script:
   - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'"
   - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'"
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+  - composer install
   - composer --version
   - composer install --no-dev --verbose
+  - composer dump-autoload
   - php artisan migrate
   - php artisan db:seed
 
