@@ -26,5 +26,5 @@ before_script:
   - php artisan db:seed
 
 script:
-  - "sudo phpunit --configuration phpunit.xml --coverage-text"
+  - "phpunit --configuration phpunit.xml --coverage-text"
   - "cat storage/logs/lumen.log"
