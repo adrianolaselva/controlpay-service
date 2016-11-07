@@ -1,3 +1,11 @@
+
+
+[![Build Status](https://travis-ci.org/adrianolaselva/php-estudo-lumen-component.svg?branch=master)](https://travis-ci.org/adrianolaselva/php-estudo-lumen-component)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/adrianolaselva/php-estudo-lumen-component/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/adrianolaselva/php-estudo-lumen-component/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/adrianolaselva/php-estudo-lumen-component/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/adrianolaselva/php-estudo-lumen-component/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/adrianolaselva/php-estudo-lumen-component/badges/build.png?b=master)](https://scrutinizer-ci.com/g/adrianolaselva/php-estudo-lumen-component/build-status/master)
+
+
 # Modelo Integração com Paygo atravéz do ControlPay
 
 ##Configuração de cron

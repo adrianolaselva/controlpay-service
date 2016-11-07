@@ -2,6 +2,9 @@
 
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
+/**
+ * Class DirectoryMonitorCommandTest
+ */
 class DirectoryMonitorCommandTest extends TestCase
 {
     /**
@@ -53,7 +56,7 @@ class DirectoryMonitorCommandTest extends TestCase
         $transacaoFileSemTef .= 'api=/venda/vender' . PHP_EOL;
         $transacaoFileSemTef .= 'param.operadorId=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.pessoaClienteId=' . PHP_EOL;
-        $transacaoFileSemTef .= 'param.formaPagamentoId=21' . PHP_EOL;
+        $transacaoFileSemTef .= 'param.formaPagamentoId=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.pedidoId=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.terminalId=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.integracaoId=' . PHP_EOL;
@@ -64,10 +67,10 @@ class DirectoryMonitorCommandTest extends TestCase
         $transacaoFileSemTef .= 'param.aguardarTefIniciarTransacao=false' . PHP_EOL;
         $transacaoFileSemTef .= 'param.parcelamentoAdmin=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.quantidadeParcelas=1' . PHP_EOL;
-        $transacaoFileSemTef .= 'param.produtosVendidos.000.id=41' . PHP_EOL;
+        $transacaoFileSemTef .= 'param.produtosVendidos.000.id=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.produtosVendidos.000.quantidade=1' . PHP_EOL;
         $transacaoFileSemTef .= 'param.produtosVendidos.000.valor=12.00' . PHP_EOL;
-        $transacaoFileSemTef .= 'param.produtosVendidos.001.id=41' . PHP_EOL;
+        $transacaoFileSemTef .= 'param.produtosVendidos.001.id=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.produtosVendidos.001.quantidade=1' . PHP_EOL;
         $transacaoFileSemTef .= 'param.produtosVendidos.001.valor=18.80' . PHP_EOL;
 
@@ -92,6 +95,7 @@ class DirectoryMonitorCommandTest extends TestCase
          */
         $resultParams = [
             'response.status' => null,
+            'response.message' => null,
             'data.intencaoVenda.id' => null,
             'data.intencaoVenda.token' => null,
             'data.intencaoVenda.data' => null,
@@ -179,6 +183,7 @@ class DirectoryMonitorCommandTest extends TestCase
          */
         $resultParams = [
             'response.status' => null,
+            'response.message' => null,
             'data.intencaoVenda.id' => null,
             'data.intencaoVenda.token' => null,
             'data.intencaoVenda.data' => null,
@@ -238,6 +243,7 @@ class DirectoryMonitorCommandTest extends TestCase
          */
         $resultParams = [
             'response.status' => null,
+            'response.message' => null,
             'data.intencaoVenda.id' => null,
             'data.intencaoVenda.token' => null,
             'data.intencaoVenda.data' => null,
@@ -274,7 +280,7 @@ class DirectoryMonitorCommandTest extends TestCase
         $consultaTransacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
         $consultaTransacaoFileSemTef .= sprintf('referencia=%s', self::$referenciaLocal) . PHP_EOL;
         $consultaTransacaoFileSemTef .= 'api=/venda/cancelarvenda' . PHP_EOL;
-        //$consultaTransacaoFileSemTef .= sprintf('param.intencaoVendaId=%s', self::$intencaoVendaId) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= sprintf('param.intencaoVendaId=%s', self::$intencaoVendaId) . PHP_EOL;
 
         \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathReq, $consultaTransacaoFileSemTef);
 
@@ -297,6 +303,7 @@ class DirectoryMonitorCommandTest extends TestCase
          */
         $resultParams = [
             'response.status' => null,
+            'response.message' => null,
 //            'data.intencaoVenda.id' => null,
 //            'data.intencaoVenda.token' => null,
 //            'data.intencaoVenda.data' => null,

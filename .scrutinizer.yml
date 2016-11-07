@@ -1,0 +1,23 @@
+filter:
+    excluded_paths:
+        - 'tests/*'
+        - 'vendor/*'
+        - 'bootstrap/*'
+        - 'config/*'
+        - 'database/*'
+        - 'resources/*'
+        - 'storage/*'
+        - 'public/*'
+
+checks:
+    php: true
+coding_style:
+    php:
+        spaces:
+            around_operators:
+                concatenation: true
+            before_keywords:
+                else: false
+                catch: false
+            within:
+                brackets: true
