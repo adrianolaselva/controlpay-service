@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fb252c6bf2ee3dd45bc926246d8f123a",
-    "content-hash": "4f75fb420960a67f09f5e6258e154f87",
+    "hash": "f143555ffde44463250849ee64794b8d",
+    "content-hash": "e2c6c194cfb4766f0670833768d8806b",
     "packages": [
         {
             "name": "adrianolaselva/controlpay-sdk",
-            "version": "0.1.10",
+            "version": "0.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adrianolaselva/controlpay-sdk.git",
-                "reference": "2f2450d447b358ed29a633c2e93c3e5faf32b2eb"
+                "reference": "0a6175d9320f6e1c01bea31b6aa28cd10b9685ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adrianolaselva/controlpay-sdk/zipball/2f2450d447b358ed29a633c2e93c3e5faf32b2eb",
-                "reference": "2f2450d447b358ed29a633c2e93c3e5faf32b2eb",
+                "url": "https://api.github.com/repos/adrianolaselva/controlpay-sdk/zipball/0a6175d9320f6e1c01bea31b6aa28cd10b9685ba",
+                "reference": "0a6175d9320f6e1c01bea31b6aa28cd10b9685ba",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                     "email": "adrianolaselva@gmail.com"
                 }
             ],
-            "time": "2016-11-04 18:53:55"
+            "time": "2016-11-08 15:45:40"
         },
         {
             "name": "aws/aws-sdk-php",
@@ -1980,16 +1980,16 @@
         },
         {
             "name": "laravel/lumen-framework",
-            "version": "v5.3.1",
+            "version": "v5.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/lumen-framework.git",
-                "reference": "c8ebc69875a2c219140b50fbb6a16c9d55d526b2"
+                "reference": "a2aee352b2dfa3d6321736c3ecfc86171f883379"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/lumen-framework/zipball/c8ebc69875a2c219140b50fbb6a16c9d55d526b2",
-                "reference": "c8ebc69875a2c219140b50fbb6a16c9d55d526b2",
+                "url": "https://api.github.com/repos/laravel/lumen-framework/zipball/a2aee352b2dfa3d6321736c3ecfc86171f883379",
+                "reference": "a2aee352b2dfa3d6321736c3ecfc86171f883379",
                 "shasum": ""
             },
             "require": {
@@ -2059,7 +2059,7 @@
                 "laravel",
                 "lumen"
             ],
-            "time": "2016-10-05 22:29:03"
+            "time": "2016-11-07 18:14:23"
         },
         {
             "name": "league/flysystem",
@@ -2511,16 +2511,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.3",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "c0125896dbb151380ab47e96c621741e79623beb"
+                "reference": "a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/c0125896dbb151380ab47e96c621741e79623beb",
-                "reference": "c0125896dbb151380ab47e96c621741e79623beb",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e",
+                "reference": "a9b97968bcde1c4de2a5ec6cbd06a0f6c919b46e",
                 "shasum": ""
             },
             "require": {
@@ -2555,7 +2555,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-10-17 15:23:22"
+            "time": "2016-11-07 23:38:38"
         },
         {
             "name": "phpcollection/phpcollection",

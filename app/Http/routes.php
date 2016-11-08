@@ -17,24 +17,24 @@ $app->get('/', function () use ($app) {
 
 $app->group(['prefix' => '/v1', 'middleware' => 'auth'], function() use ($app) {
 
-    $app->get('callbacks/{id}', 'App\Http\Controllers\CallBackController@load');
-    $app->get('callbacks', 'App\Http\Controllers\CallBackController@listAll');
+    $app->get('callbacks/{id}', 'CallBackController@load');
+    $app->get('callbacks', 'CallBackController@listAll');
 
-    $app->get('requests/{id}', 'App\Http\Controllers\RequestController@load');
-    $app->get('requests', 'App\Http\Controllers\RequestController@listAll');
+    $app->get('requests/{id}', 'RequestController@load');
+    $app->get('requests', 'RequestController@listAll');
 
-    $app->get('files/{id}', 'App\Http\Controllers\FileController@load');
-    $app->get('files', 'App\Http\Controllers\FileController@listAll');
-    $app->get('files/download/{path}/{name}', 'App\Http\Controllers\FileController@download');
-    $app->post('files/add/{path}/{name}', 'App\Http\Controllers\FileController@add');
-    $app->post('files/upload/{path}', 'App\Http\Controllers\FileController@upload');
-    $app->delete('files/{path}/{name}', 'App\Http\Controllers\FileController@delete');
+    $app->get('files/{id}', 'FileController@load');
+    $app->get('files', 'FileController@listAll');
+    $app->get('files/download/{path}/{name}', 'FileController@download');
+    $app->post('files/add/{path}/{name}', 'FileController@add');
+    $app->post('files/upload/{path}', 'FileController@upload');
+    $app->delete('files/{path}/{name}', 'FileController@delete');
 
 });
 
 $app->group(['prefix' => '/v1'], function() use ($app) {
-    $app->post('callbacks/controlpay/intencaovendacallback', 'App\Http\Controllers\CallBackController@intencaoVendaCallBack');
-    $app->get('callbacks/controlpay/intencaovendacallback', 'App\Http\Controllers\CallBackController@intencaoVendaCallBack');
+    $app->post('callbacks/controlpay/intencaovendacallback', 'CallBackController@intencaoVendaCallBack');
+    $app->get('callbacks/controlpay/intencaovendacallback', 'CallBackController@intencaoVendaCallBack');
 });
 
 
