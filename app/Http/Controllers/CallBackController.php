@@ -146,7 +146,6 @@ class CallBackController extends Controller
             return response()->json([
                 'status' => -1,
                 'message' => $ex->getMessage(),
-                'stackTrace' => $ex->getTraceAsString()
             ],Response::HTTP_BAD_REQUEST);
         }
     }
