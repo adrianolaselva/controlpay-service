@@ -33,6 +33,7 @@ $app->group(['prefix' => '/v1', 'middleware' => 'auth'], function() use ($app) {
 });
 
 $app->group(['prefix' => '/v1'], function() use ($app) {
+    $app->post('callbacks/controlpay/intencaovendacallback', 'App\Http\Controllers\CallBackController@intencaoVendaCallBack');
     $app->get('callbacks/controlpay/intencaovendacallback', 'App\Http\Controllers\CallBackController@intencaoVendaCallBack');
 });
 
