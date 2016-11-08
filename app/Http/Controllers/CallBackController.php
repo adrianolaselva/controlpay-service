@@ -73,7 +73,7 @@ class CallBackController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function controlPayIntencaoVendaCallBack(Request $request)
+    public function intencaoVendaCallBack(Request $request)
     {
         $responseContent = null;
         try{
@@ -81,13 +81,13 @@ class CallBackController extends Controller
             $params = $request->query->all();
             Log::info(sprintf("ControlPayCallBack => %s", var_export($params, true)));
 
+            if(!isset($params['intencaoVendaReferencia']))
+                throw new \Exception('Parâmetro [intencaoVendaReferencia] não encontrada');
+
             $file = Models\File::where('reference', $params['intencaoVendaReferencia'])->first();
 
             if(empty($file))
-                return response()->json([
-                    'status' => -1,
-                    'message' => 'referência não encontrada'
-                ],Response::HTTP_BAD_REQUEST);
+                throw new \Exception('Referência não encontrada');
 
             $file->callBacks()->create([
                 'host' => $request->getClientIp(),
