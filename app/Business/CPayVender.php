@@ -67,6 +67,13 @@ class CPayVender
 
             $requestModel = $this->saveRequest($venderRequest);
 
+            $pedidoResponse = $this->pedidoApi->insert((new ControlPay\Contracts\Pedido\InserirRequest())
+                ->setReferencia($data['referencia'])
+                ->setUrlRetorno(sprintf("%s/v1/callbacks/controlpay/intencaovendacallback", env('APP_URL')))
+                ->setProdutosPedido($venderRequest->getProdutosVendidos())
+            );
+
+            $venderRequest->setPedidoId($pedidoResponse->getPedido()->getId());
             $venderRequest->setReferencia($data['referencia']);
 
             $venderResponse = $this->venderApi->vender($venderRequest);

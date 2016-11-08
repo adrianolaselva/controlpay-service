@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Integracao\ControlPay;
 
 /**
@@ -78,6 +79,7 @@ class DirectoryMonitorCommand extends Command
      */
     public function handle()
     {
+
         $arguments = $this->arguments();
 
         $minutes = $arguments['minutes'];

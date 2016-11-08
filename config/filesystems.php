@@ -45,7 +45,7 @@ return [
 
         'paygo' => [
             'driver' => 'local',
-            'root' => env('DIRECTORY_MONITOR_PATH_BASE', '') //storage_path('app'),
+            'root' => env('DIRECTORY_MONITOR_PATH_BASE', '/var/paygo') //storage_path('app'),
         ],
 
         'local' => [
