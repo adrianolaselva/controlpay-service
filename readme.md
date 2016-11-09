@@ -6,7 +6,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/adrianolaselva/controlpay-service/badges/build.png?b=master)](https://scrutinizer-ci.com/g/adrianolaselva/controlpay-service/build-status/master)
 
 
-# Modelo Integração com Paygo atravéz do ControlPay
+# Modelo Integração com Pay&go através do ControlPay
 
 ##Apis
 
