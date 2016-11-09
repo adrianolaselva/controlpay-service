@@ -15,7 +15,7 @@
 ##Configuração de cron
 
 ```shell
-* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1
+* * * * * php /var/www/api.controlpay-service.com.br/artisan schedule:run >> /dev/null 2>&1
 ```
 
 ##Diretórios
