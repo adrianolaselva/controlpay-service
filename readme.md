@@ -25,22 +25,31 @@ Diretório de requisição:
 
 	/var/www/api.controlpay-service.com.br/storage/app/req/
 
+**Obs: Diretório de requisição**
+
 Diretório de resposta:
 
-	/var/www/api.controlpay-service.com.br/storage/app/req/
+	/var/www/api.controlpay-service.com.br/storage/app/resp/
+
+**Obs: Diretório de respostas**
 
 Diretório de configuração:
 
 	/var/www/api.controlpay-service.com.br/storage/app/conf/
 
+**Obs: Diretório contendo os arquivos de configuração dos terminais**
+
 Diretório de erros:
 
 	/var/www/api.controlpay-service.com.br/storage/app/error/
 
+**Obs: Quando ocorre algum erro no processamento uma cópia do arquivo é movida para este diretório e uma respoosta é gerada com a exceção**
 
 Diretório de arquivos processados:
 
 	/var/www/api.controlpay-service.com.br/storage/app/proccessed/
+	
+**Obs: Após o processamento uma cópia é adicionada neste diretório e uma resposta é gerada**
 
 
 ##Configurações
@@ -275,7 +284,6 @@ layout arquivo de response:
 	data.intencaoVenda.produtos.1.valor=18,80	
 
 
-Obs: O nome de cada arquivo deve ser único para cada identificador
+**Obs: O nome de cada arquivo deve ser único para cada identificador**
 	
-Obs 2: Sempre que for um processo assíncrono será retornado um arquivo seguindo o seguinte padrão
-	callback_(nome do arquivo de requisição)
+**Obs 2: Sempre que for um processo assíncrono será retornado um arquivo seguindo o seguinte padrão callback_(nome do arquivo de requisição)**
