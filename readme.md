@@ -23,7 +23,7 @@
 
 Diretório de requisição:
 
-/var/www/api.controlpay-service.com.br/storage/app/req/
+	/var/www/api.controlpay-service.com.br/storage/app/req/
 
 Diretório de resposta:
 
