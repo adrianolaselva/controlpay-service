@@ -1,7 +1,7 @@
 {
     "name": "laravel/lumen",
-    "version": "0.1.0",
-    "description": "The Laravel Lumen Framework.",
+    "version": "0.1.1",
+    "description": "ControlPay service.",
     "keywords": ["framework", "laravel", "lumen"],
     "license": "MIT",
     "type": "project",

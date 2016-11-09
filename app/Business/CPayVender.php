@@ -74,7 +74,7 @@ class CPayVender
 //            );
 //            $venderRequest->setPedidoId($pedidoResponse->getPedido()->getId());
 
-            $venderRequest->setReferencia($data['referencia']);
+            //$venderRequest->setReferencia($data['referencia']);
 
             $venderResponse = $this->venderApi->vender($venderRequest);
 

@@ -19,6 +19,8 @@ class CPayIntencaoVenda
 {
     CONST API_INTENCAO_VENDA_GET_BY_ID = '/intencaovenda/getbyid';
 
+    CONST API_INTENCAO_VENDA_GET_BY_FILTROS = '/intencaovenda/getbyfiltros';
+
     /**
      * @var ControlPay\Client
      */
@@ -64,6 +66,41 @@ class CPayIntencaoVenda
             $this->saveResponse($requestModel, $this->intencaoVendaApi->getResponse());
 
             $responseContent = CPayFileHelper::exportIntencaoVenda($getByIdResponse->getIntencaoVenda());
+
+        }catch (RequestException $ex){
+            Log::error($ex->getMessage());
+            $this->saveResponseException($requestModel, $ex);
+            throw new \Exception($ex->getMessage(), $ex->getCode(), $ex);
+        }catch (\Exception $ex){
+            Log::error($ex->getMessage());
+            throw new \Exception($ex->getMessage(), $ex->getCode(), $ex);
+        }
+
+        return $responseContent;
+    }
+
+    /**
+     * @param $data
+     * @return null|string
+     * @throws \Exception
+     */
+    public function getByFiltros($data)
+    {
+        $responseContent = null;
+        $requestModel = null;
+
+        try {
+
+            $getByFiltrosRequest = ControlPay\Helpers\SerializerHelper::denormalize(
+                $data, ControlPay\Contracts\IntencaoVenda\GetByFiltrosRequest::class);
+
+            $requestModel = $this->saveRequest();
+
+            $getByFiltrosResponse = $this->intencaoVendaApi->getByFiltros($getByFiltrosRequest);
+
+            $this->saveResponse($requestModel, $this->intencaoVendaApi->getResponse());
+
+            $responseContent = CPayFileHelper::exportIntencoesVenda($getByFiltrosResponse->getIntencoesVendas());
 
         }catch (RequestException $ex){
             Log::error($ex->getMessage());

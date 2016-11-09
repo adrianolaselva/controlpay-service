@@ -187,10 +187,26 @@ class CPayFileHelper
     }
 
     /**
+     * @param array $intencoesVenda
+     * @return null|string
+     */
+    public static function exportIntencoesVenda(array $intencoesVenda)
+    {
+        $responseContent = '';
+
+        foreach ($intencoesVenda as $key => $intencaoVenda)
+        {
+            $responseContent .= self::exportIntencaoVenda($intencaoVenda, sprintf("data.intencaoVenda.%s", $key));
+        }
+
+        return $responseContent;
+    }
+
+    /**
      * @param IntencaoVenda $intencaoVenda
      * @return null|string
      */
-    public static function exportIntencaoVenda(IntencaoVenda $intencaoVenda)
+    public static function exportIntencaoVenda(IntencaoVenda $intencaoVenda, $prefix = 'data.intencaoVenda')
     {
         $responseContent = null;
 
@@ -201,26 +217,26 @@ class CPayFileHelper
 
             $responseContent = self::convertObjectToFile(
                 $intencaoVenda,
-                'data.intencaoVenda.'
+                "{$prefix}."
             );
 
             if(!empty($intencaoVenda->getIntencaoVendaStatus()))
                 $responseContent .= self::convertObjectToFile(
                     $intencaoVenda->getIntencaoVendaStatus(),
-                    'data.intencaoVenda.intencaoVendaStatus.'
+                    "{$prefix}.intencaoVendaStatus."
                 );
 
             if(!empty($intencaoVenda->getFormaPagamento()))
             {
                 $responseContent .= self::convertObjectToFile(
                     $intencaoVenda->getFormaPagamento(),
-                    'data.intencaoVenda.formaPagamento.'
+                    "{$prefix}.formaPagamento."
                 );
 
                 if(!empty($intencaoVenda->getFormaPagamento()->getFluxoPagamento()))
                     $responseContent .= self::convertObjectToFile(
                         $intencaoVenda->getFormaPagamento()->getFluxoPagamento(),
-                        'data.intencaoVenda.formaPagamento.fluxoPagamento.'
+                        "{$prefix}.formaPagamento.fluxoPagamento."
                     );
             }
 
@@ -228,20 +244,20 @@ class CPayFileHelper
             if(!empty($intencaoVenda->getTerminal()))
                 $responseContent .= self::convertObjectToFile(
                     $intencaoVenda->getTerminal(),
-                    'data.intencaoVenda.terminal.'
+                    "{$prefix}.terminal."
                 );
 
             if(!empty($intencaoVenda->getPedido()))
                 $responseContent .= self::convertObjectToFile(
                     $intencaoVenda->getPedido(),
-                    'data.intencaoVenda.pedido.'
+                    "{$prefix}.pedido."
                 );
 
             if (!empty($intencaoVenda->getProdutos())) {
                 foreach ($intencaoVenda->getProdutos() as $key => $produto) {
                     $responseContent .= self::convertObjectToFile(
                         $produto,
-                        sprintf("data.intencaoVenda.produtos.%s.", $key)
+                        sprintf("%s.produtos.%s.", $prefix, $key)
                     );
                 }
             }

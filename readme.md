@@ -14,14 +14,13 @@
 * * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1
 ```
 
-
 ##Fluxo 1: Efetuar venda
 
 layout arquivo de request:
 
 	identificador=99999999999999
-	referencia=66
 	api=/venda/vender
+	param.referencia=
 	param.operadorId=
 	param.pessoaClienteId=
 	param.formaPagamentoId=21
@@ -113,7 +112,6 @@ layout arquivo de response callback:
 
     layout arquivo de request:
         identificador=99999999999999
-        referencia=99
         api=/intencaovenda/getbyid
         param.intencaoVendaId=99999
 
@@ -149,14 +147,48 @@ layout arquivo de response callback:
         data.intencaoVenda.produtos.1.quantidade=1
         data.intencaoVenda.produtos.1.valor=18,80	
 
+##Fluxo 2: Consulta de intenção por filtros
+    
+    layout arquivo de request:
+        identificador=99999999999999
+        api=/intencaovenda/getbyfiltros
+        param.referencia=99999
+
+    layout arquivo de response:
+        response.status=0
+        response.message=Dados processados com sucesso
+        data.intencaoVenda.0.id=23098
+        data.intencaoVenda.0.referencia=361622_18
+        data.intencaoVenda.0.token=632239
+        data.intencaoVenda.0.data=2016-11-09T11:25:28+0000
+        data.intencaoVenda.0.hora=11:25:28
+        data.intencaoVenda.0.valorOriginal=12
+        data.intencaoVenda.0.valorAcrescimo=0
+        data.intencaoVenda.0.valorDesconto=0
+        data.intencaoVenda.0.valorFinal=12
+        data.intencaoVenda.0.valorOriginalFormat=12,00
+        data.intencaoVenda.0.valorDescontoFormat=0,00
+        data.intencaoVenda.0.valorAcrescimoFormat=0,00
+        data.intencaoVenda.0.valorFinalFormat=12,00
+        data.intencaoVenda.0.quantidade=1
+        data.intencaoVenda.0.intencaoVendaStatus.id=10
+        data.intencaoVenda.0.intencaoVendaStatus.nome=Creditado
+        data.intencaoVenda.0.formaPagamento.id=21
+        data.intencaoVenda.0.formaPagamento.nome=TEF
+        data.intencaoVenda.0.formaPagamento.modalidade=Crédito
+        data.intencaoVenda.0.formaPagamento.fluxoPagamento.id=21
+        data.intencaoVenda.0.formaPagamento.fluxoPagamento.nome=TEF
+        data.intencaoVenda.0.terminal.id=116
+        data.intencaoVenda.0.terminal.nome=Terminal 1
+
+
 ##Fluxo 3: Cancelamento de venda
 
     layout arquivo de request:
         identificador=99999999999999
-        referencia=99
         api=/venda/cancelarvenda
         param.intencaoVendaId=99999
-
+        
     layout arquivo de response:
         response.status=0
         response.message=Dados processados com sucesso
@@ -189,8 +221,7 @@ layout arquivo de response callback:
         data.intencaoVenda.produtos.1.quantidade=1
         data.intencaoVenda.produtos.1.valor=18,80	
 
-Obs: O nome de cada arquivo deve ser único, assim como a referência	
+Obs: O nome de cada arquivo deve ser único para cada identificador
 	
 Obs 2: Sempre que for um processo assíncrono será retornado um arquivo seguindo o seguinte padrão
 	callback_(nome do arquivo de requisição)
-	

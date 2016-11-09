@@ -119,26 +119,24 @@ class DirectoryMonitorCommand extends Command
         try{
             $data = CPayFileHelper::loadFileContent($file);
 
-            if(!isset($data['identificador']))
-                throw new \Exception("parâmetro 'identificador' não informado no arquivo!!");
+            $requireParams = [
+                'identificador','api','referencia'
+            ];
 
-            if(!isset($data['api']))
-                throw new \Exception("parâmetro 'api' não informado no arquivo!!");
-
-            if(!isset($this->cPayclient[$data['identificador']]))
-                throw new \Exception("Instância não encontrata para o 'identificador' informado!!");
-
-            if(!empty(File::where('reference', $data['referencia'])->first()))
-                throw new \Exception("Referência {$data['referencia']} já utilizada");
+            foreach ($requireParams as $param)
+            {
+                if(!in_array($param, $requireParams))
+                    throw new \Exception("Parâmetro '$param' não informado no arquivo!!");
+            }
 
             if(!empty(File::where('name', basename($file))->first()))
                 throw new \Exception(sprintf("Arquivo nome %s já utilizada", basename($file)));
 
-            Log::info(sprintf("Processando arquivo %s => ref: %s", basename($file), $data['referencia']));
-            //printf("Processando arquivo %s => ref: %s %s", basename($file), $data['referencia'], PHP_EOL);
+            Log::info(sprintf("Processando arquivo %s", basename($file)));
 
             $fileModel = File::create([
                 'identifier' => $data['identificador'],
+                'api' => $data['api'],
                 'reference' => $data['referencia'],
                 'name' => basename($file),
                 'content' => json_encode($data, JSON_PRETTY_PRINT),
@@ -159,6 +157,10 @@ class DirectoryMonitorCommand extends Command
                 case CPayVender::API_VENDA_CANCELAR:
                     $responseContent = (new CPayVender($this->cPayclient[$data['identificador']], $fileModel))
                         ->cancelarVenda($data);
+                    break;
+                case CPayIntencaoVenda::API_INTENCAO_VENDA_GET_BY_FILTROS:
+                    $responseContent = (new CPayIntencaoVenda($this->cPayclient[$data['identificador']], $fileModel))
+                        ->getByFiltros($data);
                     break;
                 default:
                     throw new \Exception("Método {$data['api']} não implementado");
