@@ -14,6 +14,24 @@
 * * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1
 ```
 
+##Configurações
+
+Configuração de parâmetros
+
+    [CONTROLPAY]
+    CONTROLPAY_HOST=
+    CONTROLPAY_USER=
+    CONTROLPAY_PWD=
+    CONTROLPAY_DEFAULT_TERMINAL_ID=
+    CONTROLPAY_DEFAULT_PRODUTO_ID=
+    CONTROLPAY_DEFAULT_FORMA_PAGAMENTO_ID=
+    CONTROLPAY_DEFAULT_FORMA_AGUARDA_TEF=true
+    CONTROLPAY_DEFAULT_SENHA_TECNICA=
+
+Obs 1: O nome do arquivo deve ser o mesmo do parâmetro 'CONTROLPAY_USER'
+
+Obs 2: Este arquivo deve ser colocado no diretório /conf
+
 ##Fluxo 1: Efetuar venda
 
 layout arquivo de request:
