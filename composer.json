@@ -1,6 +1,6 @@
 {
     "name": "laravel/lumen",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "ControlPay service.",
     "keywords": ["framework", "laravel", "lumen"],
     "license": "MIT",
