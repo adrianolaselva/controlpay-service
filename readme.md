@@ -54,6 +54,25 @@ Diretório de arquivos processados:
 
 ##Configurações
 
+**Configuração de parâmetros do lumen**
+
+	APP_ENV=production
+	APP_DEBUG=true
+	APP_KEY=
+	APP_URL=http://0.0.0.0.0 <= IP da máquina
+	APP_LOG_LEVEL=error <= Nível de logs, manter default como error
+	
+	DB_CONNECTION=mysql
+	DB_HOST=localhost
+	DB_PORT=3306
+	DB_DATABASE=controlpay
+	DB_USERNAME=root
+	DB_PASSWORD=root
+	
+	STORAGE_CONFIG=local <= Configuração de storage de arquivos, como padrão é o local, ele esta configurado para usar o diretório dentro do projeto storage/app/*
+
+**Obs: Criar arquivo .env na raiz do projeto caso não exista e configurar os parâmetros**
+
 **Configuração de parâmetros**
 
 	[CONTROLPAY]
@@ -74,25 +93,25 @@ Diretório de arquivos processados:
 
 **layout arquivo de request:**
 
-	identificador=99999999999999
-	api=/venda/vender
-	param.referencia=
+	identificador=99999999999999 <= (Obrigatório)
+	api=/venda/vender <= (Obrigatório)
+	param.referencia= <= (Obrigatório) esta referência deve ser única
 	param.operadorId=
 	param.pessoaClienteId=
-	param.formaPagamentoId=21
+	param.formaPagamentoId=21 <= (Obrigatório) Este parâmetro pode ser definido no arquivo de configurações
 	param.pedidoId=
-	param.terminalId=59
+	param.terminalId=59 <= (Obrigatório) Este parâmetro pode ser definido no arquivo de configurações
 	param.integracaoId=
 	param.valorTotalVendido=
 	param.valorAcrescimo=
 	param.valorDesconto=
 	param.observacao=
-	param.aguardarTefIniciarTransacao=true
+	param.aguardarTefIniciarTransacao=true <= (Obrigatório) Este parâmetro pode ser definido no arquivo de configurações
 	param.parcelamentoAdmin=
 	param.quantidadeParcelas=
-	param.produtosVendidos.000.id=41
-	param.produtosVendidos.000.quantidade=1
-	param.produtosVendidos.000.valor=12.00
+	param.produtosVendidos.000.id=41 <= (Obrigatório) Este parâmetro pode ser definido no arquivo de configurações
+	param.produtosVendidos.000.quantidade=1 <= (Obrigatório) Este parâmetro pode ser definido no arquivo de configurações
+	param.produtosVendidos.000.valor=12.00  <= (Obrigatório)
 	param.produtosVendidos.001.id=41
 	param.produtosVendidos.001.quantidade=1
 	param.produtosVendidos.001.valor=18.80
@@ -169,9 +188,9 @@ Diretório de arquivos processados:
     
 **layout arquivo de request:**
     
-        identificador=99999999999999
-        api=/intencaovenda/getbyfiltros
-        param.referencia=99999
+        identificador=99999999999999 <= (Obrigatório)
+        api=/intencaovenda/getbyfiltros <= (Obrigatório)
+        param.referencia=99999 <= (Obrigatório)
 
 **layout arquivo de response:**
     
@@ -206,9 +225,9 @@ Diretório de arquivos processados:
 
 **layout arquivo de request:**
     
-        identificador=99999999999999
-        api=/venda/cancelarvenda
-        param.intencaoVendaId=99999
+        identificador=99999999999999 <= (Obrigatório)
+        api=/venda/cancelarvenda <= (Obrigatório)
+        param.intencaoVendaId=99999 <= (Obrigatório)
         
 **layout arquivo de response:**
     
