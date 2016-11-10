@@ -135,7 +135,7 @@ class DirectoryMonitorCommand extends Command
             if($data['api'] == CPayVender::API_VENDA_VENDER)
                 if(!empty(File::where('referencia', $data['referencia'])->first()))
                     throw new \Exception(sprintf("Referência %s já utilizada", $data['referencia']));
-
+            
             Log::info(sprintf("Processando arquivo %s", basename($file)));
 
             $fileModel = File::create([
