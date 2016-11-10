@@ -120,17 +120,21 @@ class DirectoryMonitorCommand extends Command
             $data = CPayFileHelper::loadFileContent($file);
 
             $requireParams = [
-                'identificador','api','referencia'
+                'identificador',
+                'api',
+                'referencia'
             ];
 
             foreach ($requireParams as $param)
-            {
                 if(!in_array($param, $requireParams))
                     throw new \Exception("Parâmetro '$param' não informado no arquivo!!");
-            }
 
             if(!empty(File::where('name', basename($file))->first()))
                 throw new \Exception(sprintf("Arquivo nome %s já utilizada", basename($file)));
+
+            if($data['api'] == CPayVender::API_VENDA_VENDER)
+                if(!empty(File::where('referencia', $data['referencia'])->first()))
+                    throw new \Exception(sprintf("Referência %s já utilizada", $data['referencia']));
 
             Log::info(sprintf("Processando arquivo %s", basename($file)));
 

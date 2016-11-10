@@ -110,12 +110,15 @@ layout arquivo de response callback:
 	
 ##Fluxo 2: Consulta de intenção de venda
 
-    layout arquivo de request:
+
+layout arquivo de request:
+
         identificador=99999999999999
         api=/intencaovenda/getbyid
         param.intencaoVendaId=99999
 
-    layout arquivo de response:
+layout arquivo de response:
+    
         response.status=0
         response.message=Dados processados com sucesso
         data.intencaoVenda.id=99999
@@ -149,12 +152,14 @@ layout arquivo de response callback:
 
 ##Fluxo 2: Consulta de intenção por filtros
     
-    layout arquivo de request:
+layout arquivo de request:
+    
         identificador=99999999999999
         api=/intencaovenda/getbyfiltros
         param.referencia=99999
 
-    layout arquivo de response:
+layout arquivo de response:
+    
         response.status=0
         response.message=Dados processados com sucesso
         data.intencaoVenda.0.id=23098
@@ -184,12 +189,14 @@ layout arquivo de response callback:
 
 ##Fluxo 3: Cancelamento de venda
 
-    layout arquivo de request:
+layout arquivo de request:
+    
         identificador=99999999999999
         api=/venda/cancelarvenda
         param.intencaoVendaId=99999
         
-    layout arquivo de response:
+layout arquivo de response:
+    
         response.status=0
         response.message=Dados processados com sucesso
         data.intencaoVenda.id=99999
@@ -220,6 +227,23 @@ layout arquivo de response callback:
         data.intencaoVenda.produtos.1.nome=Produto sem estoque/valor - refeição-41
         data.intencaoVenda.produtos.1.quantidade=1
         data.intencaoVenda.produtos.1.valor=18,80	
+
+##Configurações
+
+Configuração de parâmetros
+
+    [CONTROLPAY]
+    CONTROLPAY_HOST=
+    CONTROLPAY_USER=
+    CONTROLPAY_PWD=
+    CONTROLPAY_DEFAULT_TERMINAL_ID=
+    CONTROLPAY_DEFAULT_PRODUTO_ID=
+    CONTROLPAY_DEFAULT_FORMA_PAGAMENTO_ID=
+    CONTROLPAY_DEFAULT_FORMA_AGUARDA_TEF=true
+    CONTROLPAY_DEFAULT_SENHA_TECNICA=
+
+Obs: O nome do arquivo deve ser o mesmo do parâmetro 'CONTROLPAY_USER'
+
 
 Obs: O nome de cada arquivo deve ser único para cada identificador
 	
