@@ -31,8 +31,7 @@ class CPayFileHelper
     {
         $data = [];
 
-        $file = new \SplFileObject(sprintf("%s/%s",$path, $fileName));
-
+        $file = new \SplFileObject(sprintf("%s/%s", $path, $fileName));
 
         while (!$file->eof())
         {
@@ -78,17 +77,32 @@ class CPayFileHelper
      *  Formato
      *      chave=valor
      *
-     * @param $obejct
+     * @param $object
      * @param string $baseName
      * @return string
      */
-    public static function convertObjectToFile($obejct, $baseName = '')
+    public static function convertObjectToFile($object, $baseName = '')
     {
         $content = '';
-        foreach (SerializerHelper::toArray($obejct) as $key => $value)
+
+        $array = $object;
+
+        if(is_object($object))
+            $array = SerializerHelper::toArray($object);
+
+        foreach ($array as $key => $value)
         {
-            if(is_array($value))
+
+            if(is_array($value)){
+                foreach ($value as $keySub => $row){
+                    if(!is_string($row) && !is_integer($row))
+                        continue;
+
+                    $content .= sprintf("%s%s.%s=%s%s", $baseName, $key, $keySub, $row, PHP_EOL);
+                }
+
                 continue;
+            }
 
             $content .= sprintf("%s%s=%s%s", $baseName, $key, $value, PHP_EOL);
         }
@@ -103,12 +117,124 @@ class CPayFileHelper
     public static function fileCreated($file, $responseContent)
     {
         try{
+            if(!self::fileIsWork($file))
+                $file = sprintf("%s.wrk", $file);
+
+            $file = sprintf("%s/%s", self::PATH_RESP, basename($file));
+
             $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
             $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
             Storage::disk(env('STORAGE_CONFIG'))->put(
-                sprintf("%s/%s", self::PATH_RESP, basename($file)),
+                $file,
                 $responseStatus . $responseContent
+            );
+
+            self::fileUnWork($file);
+        }catch (\Exception $ex){
+            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
+                self::PATH_REQ, basename($file), $ex->getMessage()));
+        }
+    }
+
+    /**
+     * @param $file
+     * @return string
+     */
+    public static function fileToWork($file)
+    {
+        try{
+            if(self::fileIsWork($file))
+                return $file;
+
+            $fileWork = sprintf("%s.wrk", $file);
+
+            Storage::disk(env('STORAGE_CONFIG'))->move(
+                $file,
+                $fileWork
+            );
+            return $fileWork;
+        }catch (\Exception $ex){
+            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
+                self::PATH_REQ, basename($file), $ex->getMessage()));
+        }
+    }
+
+    /**
+     * @param $file
+     * @return string
+     */
+    public static function fileToLock($file)
+    {
+        try{
+            if(self::fileIsLock($file))
+                return $file;
+
+            $fileLock = sprintf("%s.lck", $file);
+
+            Storage::disk(env('STORAGE_CONFIG'))->move(
+                $file,
+                $fileLock
+            );
+
+            return $fileLock;
+        }catch (\Exception $ex){
+            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
+                self::PATH_REQ, basename($file), $ex->getMessage()));
+        }
+    }
+
+    /**
+     * @param $file
+     * @return string
+     */
+    public static function fileIsWork($file)
+    {
+        return (strpos($file, '.wrk') !== false) ? true : false;
+    }
+
+    /**
+     * @param $file
+     * @return string
+     */
+    public static function fileIsLock($file)
+    {
+        return (strpos($file, '.lck') !== false) ? true : false;
+    }
+
+    /**
+     * @param $file
+     * @return mixed
+     */
+    public static function fileUnWork($file)
+    {
+        try{
+            if(!self::fileIsWork($file))
+                return $file;
+
+            Storage::disk(env('STORAGE_CONFIG'))->move(
+                $file,
+                str_replace('.wrk', '', $file)
+            );
+        }catch (\Exception $ex){
+            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
+                self::PATH_REQ, basename($file), $ex->getMessage()));
+        }
+    }
+
+    /**
+     * @param $file
+     * @return mixed
+     */
+    public static function fileUnLock($file)
+    {
+        try{
+            if(!self::fileIsLock($file))
+                return $file;
+
+            Storage::disk(env('STORAGE_CONFIG'))->move(
+                $file,
+                str_replace('.lck', '', $file)
             );
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
@@ -123,18 +249,28 @@ class CPayFileHelper
     public static function fileProccessed($file, $responseContent)
     {
         try{
+
+            if(!self::fileIsWork($file))
+                $file = sprintf("%s.wrk", $file);
+
+            $fileResp = sprintf("%s/%s", self::PATH_RESP, basename($file));
+            $fileProcessed = sprintf("%s/%s_%s", self::PATH_PROCCESSED, date('Y-m-d_His'), basename($file));
+
             $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
             $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
             Storage::disk(env('STORAGE_CONFIG'))->put(
-                sprintf("%s/%s", self::PATH_RESP, basename($file)),
+                $fileResp,
                 $responseStatus . $responseContent
             );
+            self::fileUnWork($fileResp);
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
-                sprintf("%s/%s_%s", self::PATH_PROCCESSED, date('Y-m-d_His'), basename($file))
+                $fileProcessed
             );
+            self::fileUnWork($fileProcessed);
+
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
                 self::PATH_REQ, basename($file), $ex->getMessage()));
@@ -148,18 +284,26 @@ class CPayFileHelper
     public static function fileProccessedError(\Exception $ex, $file)
     {
         try{
+            if(!self::fileIsWork($file))
+                $file = sprintf("%s.wrk", $file);
+
+            $fileResp = sprintf("%s/%s", self::PATH_RESP, basename($file));
+            $fileError = sprintf("%s/%s_%s", self::PATH_ERROR, date('Y-m-d_His'),basename($file));
+
             $resposeContent = sprintf("response.status=%s%s", -1, PHP_EOL);
             $resposeContent .= sprintf("response.message=%s%s", $ex->getMessage(), PHP_EOL);
 
             Storage::disk(env('STORAGE_CONFIG'))->put(
-                sprintf("%s/%s", self::PATH_RESP, basename($file)),
+                $fileResp,
                 $resposeContent
             );
+            self::fileUnWork($fileResp);
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
-                sprintf("%s/%s_%s", self::PATH_ERROR, date('Y-m-d_His'),basename($file))
+                $fileError
             );
+            self::fileUnWork($fileError);
 
         }catch (\Exception $ex){
             var_dump($ex->getMessage());
@@ -177,7 +321,10 @@ class CPayFileHelper
         $data = [];
 
         try{
-            $data = self::convertFileContentToArray(sprintf("%s%s", self::getBaseDirectory(), self::PATH_REQ), basename($file));
+            $data = self::convertFileContentToArray(sprintf("%s%s",
+                self::getBaseDirectory(), self::PATH_REQ),
+                basename($file)
+            );
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao processar arquivo %s/%s => [%s]',
                 self::PATH_REQ, basename($file)), $ex->getMessage());
@@ -196,77 +343,150 @@ class CPayFileHelper
 
         foreach ($intencoesVenda as $key => $intencaoVenda)
         {
-            $responseContent .= self::exportIntencaoVenda($intencaoVenda, sprintf("data.intencaoVenda.%s", $key));
+            $responseContent .= self::exportGeneric($intencaoVenda,
+                sprintf("data.intencaoVenda.%s", $key)
+            );
         }
 
         return $responseContent;
     }
 
-    /**
-     * @param IntencaoVenda $intencaoVenda
-     * @return null|string
-     */
-    public static function exportIntencaoVenda(IntencaoVenda $intencaoVenda, $prefix = 'data.intencaoVenda')
-    {
-        $responseContent = null;
+    public static function exportGeneric(IntencaoVenda $intencaoVenda, $className){
+        $responseContent = '';
 
         try{
-
             if(empty($intencaoVenda))
                 throw new \Exception("Objeto vazio!");
 
+            $prefix = sprintf("data.%s", $className);
+
             $responseContent = self::convertObjectToFile(
                 $intencaoVenda,
-                "{$prefix}."
+                sprintf("%s.", $prefix)
             );
 
-            if(!empty($intencaoVenda->getIntencaoVendaStatus()))
-                $responseContent .= self::convertObjectToFile(
-                    $intencaoVenda->getIntencaoVendaStatus(),
-                    "{$prefix}.intencaoVendaStatus."
-                );
+            $array = SerializerHelper::toArray($intencaoVenda);
 
-            if(!empty($intencaoVenda->getFormaPagamento()))
-            {
+            if (isset($array['formaPagamento'])) {
                 $responseContent .= self::convertObjectToFile(
-                    $intencaoVenda->getFormaPagamento(),
-                    "{$prefix}.formaPagamento."
+                    $array['formaPagamento'],
+                    sprintf("%s.formaPagamento.", $prefix)
                 );
-
-                if(!empty($intencaoVenda->getFormaPagamento()->getFluxoPagamento()))
-                    $responseContent .= self::convertObjectToFile(
-                        $intencaoVenda->getFormaPagamento()->getFluxoPagamento(),
-                        "{$prefix}.formaPagamento.fluxoPagamento."
-                    );
             }
 
-
-            if(!empty($intencaoVenda->getTerminal()))
-                $responseContent .= self::convertObjectToFile(
-                    $intencaoVenda->getTerminal(),
-                    "{$prefix}.terminal."
-                );
-
-            if(!empty($intencaoVenda->getPedido()))
-                $responseContent .= self::convertObjectToFile(
-                    $intencaoVenda->getPedido(),
-                    "{$prefix}.pedido."
-                );
-
-            if (!empty($intencaoVenda->getProdutos())) {
-                foreach ($intencaoVenda->getProdutos() as $key => $produto) {
+            if (isset($array['produtos'])) {
+                foreach ($array['produtos'] as $key => $produto) {
                     $responseContent .= self::convertObjectToFile(
                         $produto,
                         sprintf("%s.produtos.%s.", $prefix, $key)
                     );
                 }
             }
-            
+
+            if (isset($array['pagamentosExternos'])) {
+                foreach ($array['pagamentosExternos'] as $key => $pagamentosExterno) {
+                    $responseContent .= self::convertObjectToFile(
+                        $pagamentosExterno,
+                        sprintf("%s.pagamentosExternos.%s.", $prefix, $key)
+                    );
+                }
+            }
+
             return $responseContent;
         }catch (\Exception $ex){
+            var_dump($ex->getMessage());
             Log::error(sprintf("Falha ao exportar arquivo fn: [%s]", __FUNCTION__));
         }
     }
+
+//    /**
+//     * @param IntencaoVenda $intencaoVenda
+//     * @return null|string
+//     */
+//    public static function exportIntencaoVenda(IntencaoVenda $intencaoVenda, $prefix = 'data.intencaoVenda')
+//    {
+//        $responseContent = null;
+//
+//        try{
+//
+//            if(empty($intencaoVenda))
+//                throw new \Exception("Objeto vazio!");
+//
+//            $responseContent = self::convertObjectToFile(
+//                $intencaoVenda,
+//                "{$prefix}."
+//            );
+//
+//            if(!empty($intencaoVenda->getIntencaoVendaStatus()))
+//                $responseContent .= self::convertObjectToFile(
+//                    $intencaoVenda->getIntencaoVendaStatus(),
+//                    "{$prefix}.intencaoVendaStatus."
+//                );
+//
+//            if(!empty($intencaoVenda->getFormaPagamento()))
+//            {
+//                $responseContent .= self::convertObjectToFile(
+//                    $intencaoVenda->getFormaPagamento(),
+//                    "{$prefix}.formaPagamento."
+//                );
+//
+//                if(!empty($intencaoVenda->getFormaPagamento()->getFluxoPagamento()))
+//                    $responseContent .= self::convertObjectToFile(
+//                        $intencaoVenda->getFormaPagamento()->getFluxoPagamento(),
+//                        "{$prefix}.formaPagamento.fluxoPagamento."
+//                    );
+//            }
+//
+//
+//            if(!empty($intencaoVenda->getTerminal()))
+//                $responseContent .= self::convertObjectToFile(
+//                    $intencaoVenda->getTerminal(),
+//                    "{$prefix}.terminal."
+//                );
+//
+//            if(!empty($intencaoVenda->getPedido()))
+//                $responseContent .= self::convertObjectToFile(
+//                    $intencaoVenda->getPedido(),
+//                    "{$prefix}.pedido."
+//                );
+//
+//            if (!empty($intencaoVenda->getProdutos())) {
+//                foreach ($intencaoVenda->getProdutos() as $key => $produto) {
+//                    $responseContent .= self::convertObjectToFile(
+//                        $produto,
+//                        sprintf("%s.produtos.%s.", $prefix, $key)
+//                    );
+//                }
+//            }
+//
+//            if (!empty($intencaoVenda->getPagamentosExternos())) {
+//                foreach ($intencaoVenda->getPagamentosExternos() as $key => $pagamentosExterno) {
+//                    $responseContent .= self::convertObjectToFile(
+//                        $pagamentosExterno,
+//                        sprintf("%s.PagamentosExternos.%s.", $prefix, $key)
+//                    );
+//                }
+//            }
+//
+////            if (!empty($intencaoVenda->getPagamentosExternos())) {
+////                foreach ($intencaoVenda->getPagamentosExternos() as $pagamentoExterno) {
+////                    foreach ($pagamentoExterno->getComprovanteAdquirenteLinhas() as $key => $linha){
+////                        $responseContent .= sprintf(
+////                            "%s.PagamentosExternos.ComprovanteAdquirente.%s=%s%s",
+////                            $prefix,
+////                            $key,
+////                            $linha,
+////                            PHP_EOL
+////                        );
+////                    }
+////                }
+////            }
+//
+//            return $responseContent;
+//        }catch (\Exception $ex){
+//            Log::error(sprintf("Falha ao exportar arquivo fn: [%s]", __FUNCTION__));
+//        }
+//    }
 
     public static function getBaseDirectory()
     {

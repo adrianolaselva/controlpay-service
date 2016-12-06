@@ -107,6 +107,14 @@ class DirectoryMonitorCommand extends Command
 
         foreach ($files as $file)
         {
+            if(strpos($file, '.wrk') !== false)
+                continue;
+
+            $file = CPayFileHelper::fileToWork($file);
+
+            if(!Storage::disk(env('STORAGE_CONFIG'))->has($file))
+                continue;
+
             $this->process($file);
         }
     }
@@ -130,11 +138,13 @@ class DirectoryMonitorCommand extends Command
                     throw new \Exception("Parâmetro '$param' não informado no arquivo!!");
 
             if(!empty(File::where('name', basename($file))->first()))
-                throw new \Exception(sprintf("Arquivo nome %s já utilizada", basename($file)));
+                throw new \Exception(sprintf("Arquivo nome %s já utilizada",
+                    str_replace('.wrk', '', basename($file))));
 
             if($data['api'] == CPayVender::API_VENDA_VENDER)
                 if(!empty(File::where('reference', $data['referencia'])->first()))
-                    throw new \Exception(sprintf("Referência %s já utilizada", $data['referencia']));
+                    throw new \Exception(sprintf("Referência %s já utilizada",
+                        str_replace('.wrk', '', $data['referencia'])));
 
             Log::info(sprintf("Processando arquivo %s", basename($file)));
 

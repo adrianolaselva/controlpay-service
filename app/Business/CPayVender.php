@@ -80,7 +80,9 @@ class CPayVender
 
             $this->saveResponse($requestModel, $this->venderApi->getResponse());
 
-            $responseContent = CPayFileHelper::exportIntencaoVenda($venderResponse->getIntencaoVenda());
+            $responseContent = CPayFileHelper::exportGeneric($venderResponse->getIntencaoVenda(), 'intencaoVenda');
+
+            //$responseContent = CPayFileHelper::exportIntencaoVenda($venderResponse->getIntencaoVenda());
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
             $this->saveResponseException($requestModel, $ex);
@@ -116,7 +118,8 @@ class CPayVender
 
             $this->saveResponse($requestModel, $this->venderApi->getResponse());
 
-            $responseContent = CPayFileHelper::exportIntencaoVenda($cancelarVendaResponse->getIntencaoVenda());
+            $responseContent = CPayFileHelper::exportGeneric($cancelarVendaResponse->getIntencaoVenda(), 'intencaoVenda');
+            //$responseContent = CPayFileHelper::exportIntencaoVenda($cancelarVendaResponse->getIntencaoVenda());
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
             $this->saveResponseException($requestModel, $ex);

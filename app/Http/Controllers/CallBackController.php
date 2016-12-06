@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Integracao\ControlPay\API\IntencaoVendaApi;
 use Integracao\ControlPay\Client;
+use Integracao\ControlPay\Contracts\IntencaoVenda\GetByFiltrosRequest;
 
 /**
  * Class CallBackController
@@ -115,7 +116,14 @@ class CallBackController extends Controller
                 parse_ini_string(Storage::disk(env('STORAGE_CONFIG'))->get(sprintf("conf/%s", $file->identifier)))
             ));
 
-            $getByIdResponse = $intencaoVendaApi->getById($params['intencaoVendaId']);
+            $response = $intencaoVendaApi->getByFiltros( (new GetByFiltrosRequest())
+                ->setIntencaoVendaId($params['intencaoVendaId'])
+            );
+
+            if(count($response->getIntencoesVendas()) == 0)
+                throw new \Exception('Intenção venda não encontrada a partir do intencaoVendaId');
+
+            $intencaoVenda = $response->getIntencoesVendas()[0];
 
             $file->requests()->create([
                 'req_host' => $intencaoVendaApi->getResponse()->getEffectiveUrl(),
@@ -134,7 +142,7 @@ class CallBackController extends Controller
             ]);
 
             CPayFileHelper::fileCreated("callback_$file->name",
-                CPayFileHelper::exportIntencaoVenda($getByIdResponse->getIntencaoVenda())
+                CPayFileHelper::exportGeneric($intencaoVenda, 'intencaoVenda')
             );
 
             return response()->json([

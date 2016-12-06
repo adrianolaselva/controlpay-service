@@ -65,7 +65,8 @@ class CPayIntencaoVenda
 
             $this->saveResponse($requestModel, $this->intencaoVendaApi->getResponse());
 
-            $responseContent = CPayFileHelper::exportIntencaoVenda($getByIdResponse->getIntencaoVenda());
+            $responseContent = CPayFileHelper::exportGeneric($getByIdResponse->getIntencaoVenda(), 'intencaoVenda');
+            //$responseContent = CPayFileHelper::exportIntencaoVenda($getByIdResponse->getIntencaoVenda());
 
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
