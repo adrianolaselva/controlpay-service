@@ -277,5 +277,134 @@ Diretório de arquivos processados:
     CONTROLPAY_DEFAULT_SENHA_TECNICA=
 
 **Obs: O nome de cada arquivo deve ser único para cada identificador**
-	
+
 **Obs 2: Sempre que for um processo assíncrono será retornado um arquivo seguindo o seguinte padrão callback_(nome do arquivo de requisição)**
+
+
+##Atualização
+
+**Upgrade e downgrade de versão**
+
+```sh
+    cd /var/www/api.controlpay-service.com.br/  && git fetch --tags
+    cd /var/www/api.controlpay-service.com.br/  && git checkout tags/{VERSAO_DO_COMPONENTE} -f
+    cd /var/www/api.controlpay-service.com.br/  && /usr/local/bin/composer update
+    php /var/www/api.controlpay-service.com.br/artisan migrate --force
+```
+
+##Instalação ambiente no rethat 7.2
+
+```sh
+    #Configuração de ambiente RedHat 7.2
+    #Configurações de ambiente lumen
+    
+    yum -y update
+    yum install -y wget
+    
+    #Repositórios
+    rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+    
+    wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
+    rpm -ivh mysql-community-release-el6-5.noarch.rpm
+    
+    #instalação php
+    yum install -y php56w php56w-fpm php56w-opcache 
+    yum install -y php56w-cli php56w-common php56w-mbstring php56w-mcrypt php56w-mysql php56w-pdo php56w-pear php56w-xml php56w-soap php56w-odbc php56w-intl
+    yum install -y httpd
+    service httpd start
+    #mysql
+    yum install -y mysql-server
+    
+    #inicia mysql
+    service mysqld start
+    #configurações do mysql
+    mysql -u root -e 'create database controlpay;'
+    mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'"
+    mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'"
+    echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+    
+    #abrir porta 80
+    iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+    service iptables save
+    
+    #instalação do git
+    yum install -y git
+    
+    #instalação do composer
+    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+    
+    #Baixar projeto do github e instalar
+    #cd /var/www/
+    git clone --depth=50 --branch=0.1.3 https://github.com/adrianolaselva/controlpay-service.git /var/www/api.controlpay-service.com.br
+    #cd api.controlpay-service.com.br
+    mkdir -p /var/www/api.controlpay-service.com.br/storage/app/conf
+    mkdir -p /var/www/api.controlpay-service.com.br/storage/app/error
+    mkdir -p /var/www/api.controlpay-service.com.br/storage/app/proccessed
+    mkdir -p /var/www/api.controlpay-service.com.br/storage/app/req
+    mkdir -p /var/www/api.controlpay-service.com.br/storage/app/resp
+    
+    chmod 777 -R /var/www/api.controlpay-service.com.br/storage/
+    
+    cd /var/www/api.controlpay-service.com.br/  && /usr/local/bin/composer install
+    mv /var/www/api.controlpay-service.com.br/.env.example /var/www/api.controlpay-service.com.br/.env
+    
+    php /var/www/api.controlpay-service.com.br/artisan migrate --force
+    php /var/www/api.controlpay-service.com.br/artisan db:seed --force
+    
+    #configurações do apache
+    echo '
+    NameVirtualHost *:80
+    
+    <Directory "/var/www">
+        AllowOverride All
+        # Allow open access:
+        #Require all granted
+    </Directory>
+    
+    <VirtualHost *:80>
+            DocumentRoot /var/www/api.controlpay-service.com.br/public
+    </VirtualHost>' > /etc/httpd/conf.d/vhost.conf
+    
+    #inicia apache
+    service httpd restart
+    
+    #configuração de cron
+    echo "* * * * * php /var/www/api.controlpay-service.com.br/artisan schedule:run >> /dev/null 2>&1" >> mycron
+    crontab mycron
+    rm -rf mycron
+    
+    echo '
+    APP_ENV=production
+    APP_DEBUG=true
+    APP_KEY=
+    APP_URL=
+    APP_LOG_LEVEL=error
+    
+    DB_CONNECTION=mysql
+    DB_HOST=localhost
+    DB_PORT=3306
+    DB_DATABASE=controlpay
+    DB_USERNAME=root
+    DB_PASSWORD=root
+    
+    STORAGE_CONFIG=local ' >  /var/www/api.controlpay-service.com.br/.env
+    
+    #Arquivos de configurações do estabelecimento
+    echo '
+    [CONTROLPAY]
+    CONTROLPAY_HOST=http://pay2alldemo.azurewebsites.net/webapi
+    CONTROLPAY_USER=99999999999
+    CONTROLPAY_PWD=123mudar
+    CONTROLPAY_KEY=y%2bLGOLoPhcbZJ0G0XvuL1o9rCrCc7o2%2fzbrPaJm1t8wJus3jOR6htmabgLY4O9wOTC0b82lCyMu1xMrruFO7GfnQRLHt6%2fbwJ9SJ3XFeGUI%3w
+    CONTROLPAY_DEFAULT_TERMINAL_ID=116
+    CONTROLPAY_DEFAULT_PRODUTO_ID=85
+    CONTROLPAY_DEFAULT_PRODUTO_QTDE=1
+    CONTROLPAY_DEFAULT_FORMA_PAGAMENTO_ID=21
+    CONTROLPAY_DEFAULT_FORMA_AGUARDA_TEF=true
+    CONTROLPAY_DEFAULT_SENHA_TECNICA=123mudar' > /var/www/api.controlpay-service.com.br/storage/app/conf/99999999999
+    
+    #Desativa políticas de segurança default do centos
+    setenforce 0
+
+```

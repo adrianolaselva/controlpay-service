@@ -351,21 +351,21 @@ class CPayFileHelper
         return $responseContent;
     }
 
-    public static function exportGeneric(IntencaoVenda $intencaoVenda, $className){
+    public static function exportGeneric($objeto, $className){
         $responseContent = '';
 
         try{
-            if(empty($intencaoVenda))
+            if(empty($objeto))
                 throw new \Exception("Objeto vazio!");
 
             $prefix = sprintf("data.%s", $className);
 
             $responseContent = self::convertObjectToFile(
-                $intencaoVenda,
+                $objeto,
                 sprintf("%s.", $prefix)
             );
 
-            $array = SerializerHelper::toArray($intencaoVenda);
+            $array = SerializerHelper::toArray($objeto);
 
             if (isset($array['formaPagamento'])) {
                 $responseContent .= self::convertObjectToFile(
