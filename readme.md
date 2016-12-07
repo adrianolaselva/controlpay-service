@@ -552,3 +552,5 @@ Diretório de arquivos processados:
     setenforce 0
 
 ```
+
+**Obs: Antes de executar os scripts de configuraçao do ambiente, certifique-se de que esteja com privilégios de root**
