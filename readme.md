@@ -150,37 +150,181 @@ Diretório de arquivos processados:
 	data.intencaoVenda.produtos.1.valor=18,80
 
 **layout arquivo de response callback:**
-
+    
 	response.status=0
-	response.message=Dados processados com sucesso
-	data.intencaoVenda.id=99999
-	data.intencaoVenda.token=375588
-	data.intencaoVenda.data=2016-11-03T09:44:18+0000
-	data.intencaoVenda.hora=09:44:18
-	data.intencaoVenda.valorOriginal=30.8
-	data.intencaoVenda.valorAcrescimo=0
-	data.intencaoVenda.valorDesconto=0
-	data.intencaoVenda.valorFinal=30.8
-	data.intencaoVenda.valorOriginalFormat=30,80
-	data.intencaoVenda.valorDescontoFormat=0,00
-	data.intencaoVenda.valorAcrescimoFormat=0,00
-	data.intencaoVenda.valorFinalFormat=30,80
-	data.intencaoVenda.quantidade=2
-	data.intencaoVenda.intencaoVendaStatus.id=10
-	data.intencaoVenda.intencaoVendaStatus.nome=Creditado
-	data.intencaoVenda.formaPagamento.id=21
-	data.intencaoVenda.formaPagamento.nome=TEF
-	data.intencaoVenda.formaPagamento.modalidade=Crédito
-	data.intencaoVenda.produtos.0.id=99
-	data.intencaoVenda.produtos.0.itemProdutoId=12701
-	data.intencaoVenda.produtos.0.nome=Produto sem estoque/valor - refeição-41
-	data.intencaoVenda.produtos.0.quantidade=1
-	data.intencaoVenda.produtos.0.valor=12,00
-	data.intencaoVenda.produtos.1.id=99
-	data.intencaoVenda.produtos.1.itemProdutoId=12702
-	data.intencaoVenda.produtos.1.nome=Produto sem estoque/valor - refeição-41
-	data.intencaoVenda.produtos.1.quantidade=1
-	data.intencaoVenda.produtos.1.valor=18,80	
+    response.message=Dados processados com sucesso
+    data.intencaoVenda.id=23822
+    data.intencaoVenda.formaPagamento.id=21
+    data.intencaoVenda.formaPagamento.nome=TEF
+    data.intencaoVenda.formaPagamento.modalidade=Crédito
+    data.intencaoVenda.terminal.id=116
+    data.intencaoVenda.terminal.nome=Terminal 1
+    data.intencaoVenda.intencaoVendaStatus.id=10
+    data.intencaoVenda.intencaoVendaStatus.nome=Creditado
+    data.intencaoVenda.referencia=361622_218
+    data.intencaoVenda.token=028953
+    data.intencaoVenda.data=2016-12-06T18:22:26+0000
+    data.intencaoVenda.hora=18:22:26
+    data.intencaoVenda.valorOriginal=12
+    data.intencaoVenda.valorAcrescimo=0
+    data.intencaoVenda.valorDesconto=0
+    data.intencaoVenda.valorFinal=12
+    data.intencaoVenda.valorOriginalFormat=12,00
+    data.intencaoVenda.valorDescontoFormat=0,00
+    data.intencaoVenda.valorAcrescimoFormat=0,00
+    data.intencaoVenda.valorFinalFormat=12,00
+    data.intencaoVenda.latitude=0
+    data.intencaoVenda.longitude=0
+    data.intencaoVenda.quantidade=1
+    data.intencaoVenda.formaPagamento.id=21
+    data.intencaoVenda.formaPagamento.nome=TEF
+    data.intencaoVenda.formaPagamento.modalidade=Crédito
+    data.intencaoVenda.formaPagamento.fluxoPagamento.id=21
+    data.intencaoVenda.formaPagamento.fluxoPagamento.nome=TEF
+	data.intencaoVenda.pagamentosExternos.0.id=1997
+    data.intencaoVenda.pagamentosExternos.0.tipo=5
+    data.intencaoVenda.pagamentosExternos.0.origem=5
+    data.intencaoVenda.pagamentosExternos.0.tipoParcelamento=2
+    data.intencaoVenda.pagamentosExternos.0.pagamentoExternoStatus.id=15
+    data.intencaoVenda.pagamentosExternos.0.pagamentoExternoStatus.nome=Finalizado
+    data.intencaoVenda.pagamentosExternos.0.nsuTid=18224913585
+    data.intencaoVenda.pagamentosExternos.0.autorizacao=000940
+    data.intencaoVenda.pagamentosExternos.0.adquirente=REDECARD
+    data.intencaoVenda.pagamentosExternos.0.codigoRespostaAdquirente=0
+    data.intencaoVenda.pagamentosExternos.0.mensagemRespostaAdquirente=AUTORIZADA 000940
+    data.intencaoVenda.pagamentosExternos.0.dataAdquirente=2016-12-06T18:22:49
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.0=000-000 = CRT
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.1=001-000 = 361622_218
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.2=002-000 = 361622_218
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.3=003-000 = 9999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.4=009-000 = 0
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.5=010-000 = REDECARD
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.6=011-000 = 10
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.7=012-000 = 99999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.8=013-000 = 000999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.9=015-000 = 0999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.10=016-000 = 0999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.11=022-000 = 09999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.12=023-000 = 999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.13=027-000 = 99999999999999999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.14=028-000 = 25
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.15=029-001 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.16=029-002 = ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.17=029-003 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.18=029-004 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.19=029-005 =            COMPROVANTE DE TEF
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.20=029-006 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.21=029-007 =         ESTABELECIMENTO DE TESTE
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.22=029-008 =     999999999999999/99999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.23=029-009 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.24=029-010 =     06/12/2016              18:22:49
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.25=029-011 =     REF.FISCAL:361622_218
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.26=029-012 =     DOC:999999        AUTORIZ:999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.27=029-013 =     REF.HOST:99999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.28=029-014 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.29=029-015 =     DEMOCARD        ************9999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.30=029-016 =     VENDA CREDITO A VISTA
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.31=029-017 =     VALOR FINAL: R$ 12,00
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.32=029-018 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.33=029-019 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.34=029-020 =     ________________________________
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.35=029-021 =                     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.36=029-022 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.37=029-023 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.38=029-024 = ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.39=029-025 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.40=030-000 = AUTORIZADA 999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.41=040-000 = DEMOCARD
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.42=710-000 = 4
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.43=711-001 = VENDA CREDITO A VISTA
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.44=711-002 = DEMOCARD                ************1231
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.45=711-003 = POS:99999999  DOC:999999  AUTORIZ:999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.46=711-004 = VALOR FINAL: R$ 12,00
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.47=712-000 = 22
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.48=713-001 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.49=713-002 = ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.50=713-003 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.51=713-004 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.52=713-005 =            COMPROVANTE DE TEF
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.53=713-006 =               VIA: CLIENTE
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.54=713-007 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.55=713-008 =         ESTABELECIMENTO DE TESTE
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.56=713-009 =     999999999999999/99999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.57=713-010 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.58=713-011 =     06/12/2016              18:22:49
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.59=713-012 =     REF.FISCAL:361622_218
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.60=713-013 =     DOC:999999        AUTORIZ:999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.61=713-014 =     REF.HOST:99999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.62=713-015 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.63=713-016 =     DEMOCARD        ************9999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.64=713-017 =     VENDA CREDITO A VISTA
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.65=713-018 =     VALOR FINAL: R$ 12,00
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.66=713-019 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.67=713-020 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.68=713-021 = ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.69=713-022 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.70=714-000 = 26
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.71=715-001 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.72=715-002 = ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.73=715-003 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.74=715-004 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.75=715-005 =            COMPROVANTE DE TEF
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.76=715-006 =           VIA: ESTABELECIMENTO
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.77=715-007 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.78=715-008 =         ESTABELECIMENTO DE TESTE
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.79=715-009 =     999999999999999/99999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.80=715-010 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.81=715-011 =     06/12/2016              18:22:49
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.82=715-012 =     REF.FISCAL:361622_218
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.83=715-013 =     DOC:999999        AUTORIZ:999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.84=715-014 =     REF.HOST:99999999999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.85=715-015 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.86=715-016 =     DEMOCARD        ************9999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.87=715-017 =     VENDA CREDITO A VISTA
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.88=715-018 =     VALOR FINAL: R$ 12,00
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.89=715-019 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.90=715-020 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.91=715-021 =     ________________________________
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.92=715-022 =                     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.93=715-023 =     
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.94=715-024 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.95=715-025 = ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.96=715-026 = ****************************************
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.97=718-000 = DEMO
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.98=719-000 = ESTAB 42
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.99=729-000 = 2
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.100=730-000 = 1
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.101=731-000 = 1
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.102=732-000 = 1
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.103=737-000 = 3
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.104=739-000 = 001
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.105=740-000 = 999999*****99999
+    data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.106=999-999 = 0
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.0=****************************************
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.1= ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.2= ****************************************
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.3=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.4=            COMPROVANTE DE TEF
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.5=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.6=         ESTABELECIMENTO DE TESTE
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.7=     999999999999999/99999999
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.8=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.9=     06/12/2016              18:22:49
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.10=     REF.FISCAL:361622_218
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.11=     DOC:003820        AUTORIZ:999999
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.12=     REF.HOST:99999999999
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.13=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.14=     DEMOCARD        ************9999
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.15=     VENDA CREDITO A VISTA
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.16=     VALOR FINAL: R$ 12,00
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.17=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.18=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.19=     ________________________________
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.20=                     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.21=     
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.22= ****************************************
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.23= ********* DEMONSTRACAO  PAYGO *********
+    data.intencaoVenda.pagamentosExternos.0.comprovanteAdquirente.24= ****************************************
 
 
 
