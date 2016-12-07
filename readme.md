@@ -187,11 +187,11 @@ Diretório de arquivos processados:
     data.intencaoVenda.pagamentosExternos.0.tipoParcelamento=2
     data.intencaoVenda.pagamentosExternos.0.pagamentoExternoStatus.id=15
     data.intencaoVenda.pagamentosExternos.0.pagamentoExternoStatus.nome=Finalizado
-    data.intencaoVenda.pagamentosExternos.0.nsuTid=18224913585
-    data.intencaoVenda.pagamentosExternos.0.autorizacao=000940
+    data.intencaoVenda.pagamentosExternos.0.nsuTid=99999999999
+    data.intencaoVenda.pagamentosExternos.0.autorizacao=999999
     data.intencaoVenda.pagamentosExternos.0.adquirente=REDECARD
     data.intencaoVenda.pagamentosExternos.0.codigoRespostaAdquirente=0
-    data.intencaoVenda.pagamentosExternos.0.mensagemRespostaAdquirente=AUTORIZADA 000940
+    data.intencaoVenda.pagamentosExternos.0.mensagemRespostaAdquirente=AUTORIZADA 999999
     data.intencaoVenda.pagamentosExternos.0.dataAdquirente=2016-12-06T18:22:49
     data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.0=000-000 = CRT
     data.intencaoVenda.pagamentosExternos.0.respostaAdquirente.1=001-000 = 361622_218
