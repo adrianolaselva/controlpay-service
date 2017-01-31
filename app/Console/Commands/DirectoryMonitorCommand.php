@@ -41,30 +41,12 @@ class DirectoryMonitorCommand extends Command
     private $cPayclient;
 
     /**
-     * @var CPayVender
-     */
-    private $cPayVender;
-
-    /**
-     * @var CPayIntencaoVenda
-     */
-    private $cPayIntencaoVenda;
-
-    /**
      * DirectoryMonitorCommand constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->loadConfig();
-    }
 
-    /**
-     * Carrega array contendo configurações a partir de diretório /conf
-     *
-     */
-    private function loadConfig()
-    {
         $files = Storage::disk(env('STORAGE_CONFIG'))->files(CPayFileHelper::PATH_CONFIG);
 
         foreach ($files as $file)

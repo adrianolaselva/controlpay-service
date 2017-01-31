@@ -67,22 +67,11 @@ class CPayVender
 
             $requestModel = $this->saveRequest($venderRequest);
 
-//            $pedidoResponse = $this->pedidoApi->insert((new ControlPay\Contracts\Pedido\InserirRequest())
-//                ->setReferencia($data['referencia'])
-//                ->setUrlRetorno(sprintf("%s/v1/callbacks/controlpay/intencaovendacallback", env('APP_URL')))
-//                ->setProdutosPedido($venderRequest->getProdutosVendidos())
-//            );
-//            $venderRequest->setPedidoId($pedidoResponse->getPedido()->getId());
-
-            //$venderRequest->setReferencia($data['referencia']);
-
             $venderResponse = $this->venderApi->vender($venderRequest);
 
             $this->saveResponse($requestModel, $this->venderApi->getResponse());
 
             $responseContent = CPayFileHelper::exportGeneric($venderResponse->getIntencaoVenda(), 'intencaoVenda');
-
-            //$responseContent = CPayFileHelper::exportIntencaoVenda($venderResponse->getIntencaoVenda());
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
             $this->saveResponseException($requestModel, $ex);
@@ -119,7 +108,6 @@ class CPayVender
             $this->saveResponse($requestModel, $this->venderApi->getResponse());
 
             $responseContent = CPayFileHelper::exportGeneric($cancelarVendaResponse->getIntencaoVenda(), 'intencaoVenda');
-            //$responseContent = CPayFileHelper::exportIntencaoVenda($cancelarVendaResponse->getIntencaoVenda());
         }catch (RequestException $ex){
             Log::error($ex->getMessage());
             $this->saveResponseException($requestModel, $ex);

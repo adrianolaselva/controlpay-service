@@ -325,6 +325,7 @@ class CPayFileHelper
                 self::getBaseDirectory(), self::PATH_REQ),
                 basename($file)
             );
+
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao processar arquivo %s/%s => [%s]',
                 self::PATH_REQ, basename($file)), $ex->getMessage());
