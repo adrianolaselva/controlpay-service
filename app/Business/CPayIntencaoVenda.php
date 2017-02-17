@@ -101,7 +101,8 @@ class CPayIntencaoVenda
 
             $this->saveResponse($requestModel, $this->intencaoVendaApi->getResponse());
 
-            $responseContent = CPayFileHelper::exportIntencoesVenda($getByFiltrosResponse->getIntencoesVendas());
+            if(!is_null($getByFiltrosResponse) && is_array($getByFiltrosResponse->getIntencoesVendas()))
+                $responseContent = CPayFileHelper::exportIntencoesVenda($getByFiltrosResponse->getIntencoesVendas());
 
         }catch (RequestException $ex){
             Log::error($ex->getMessage());

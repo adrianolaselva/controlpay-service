@@ -27,6 +27,63 @@ class DirectoryMonitorCommandTest extends TestCase
     }
 
     /**
+     * Simula callback de resposta no controlpay
+     */
+    public function testConsultaIntencaoVendaPorFiltros()
+    {
+        $referenciaLocal = rand(999999, 99999999) . '_cons_id';
+        $pathReq = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_REQ, $referenciaLocal);
+        $pathResp = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, $referenciaLocal);
+
+        $consultaTransacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= sprintf('referencia=%s', $referenciaLocal) . PHP_EOL;
+        $consultaTransacaoFileSemTef .= 'api=/intencaovenda/getbyfiltros' . PHP_EOL;
+
+        \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathReq, $consultaTransacaoFileSemTef);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathReq));
+
+        \Illuminate\Support\Facades\Artisan::call('controlpay-service:start', [
+            'minutes' => 6
+        ]);
+
+        $resultAsText = \Illuminate\Support\Facades\Artisan::output();
+        $this->assertEmpty($resultAsText);
+        $this->assertTrue(true);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathResp));
+
+        $file = new \SplFileObject(sprintf("%s/%s/%s",\App\Helpers\CPayFileHelper::getBaseDirectory(), \App\Helpers\CPayFileHelper::PATH_RESP, basename($pathResp)));
+
+        /**
+         * Valida atributos obrigatórios na resposta
+         */
+        $resultParams = [
+            'response.status' => null,
+            'response.message' => null,
+        ];
+
+        while (!$file->eof())
+        {
+            $row = $file->fgetcsv('=');
+
+            if(empty($row[0]) & empty($row[1]))
+                continue;
+
+            list($key, $value) = $row;
+
+            if(in_array($key, array_keys($resultParams)))
+                $resultParams[$key] = $value;
+        }
+
+        foreach ($resultParams as $key => $param)
+            $this->assertNotNull($param, sprintf("dado do atributo %s não foi encontrado na resposta", $key));
+
+    }
+
+
+
+    /**
      * Teste básico de execução.
      *
      * @return void
@@ -48,11 +105,11 @@ class DirectoryMonitorCommandTest extends TestCase
      */
     public function testTransacaoSemTef()
     {
-        $pathReq = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
-        $pathResp = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
+        $pathReq = sprintf("%s/sttest_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
+        $pathResp = sprintf("%s/sttest_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
 
         $transacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
-        $transacaoFileSemTef .= sprintf('referencia=%s', self::$referenciaLocal) . PHP_EOL;
+        $transacaoFileSemTef .= sprintf('referencia=st%s', self::$referenciaLocal) . PHP_EOL;
         $transacaoFileSemTef .= 'api=/venda/vender' . PHP_EOL;
         $transacaoFileSemTef .= 'param.operadorId=' . PHP_EOL;
         $transacaoFileSemTef .= 'param.pessoaClienteId=' . PHP_EOL;
@@ -126,11 +183,78 @@ class DirectoryMonitorCommandTest extends TestCase
     }
 
     /**
+     * Teste de transação sem tef
+     */
+    public function testTransacaoSemTefModeloSimples()
+    {
+        $pathReq = sprintf("%s/ststest_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
+        $pathResp = sprintf("%s/ststest_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
+
+        $transacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
+        $transacaoFileSemTef .= 'api=/venda/vender' . PHP_EOL;
+        $transacaoFileSemTef .= sprintf('param.referencia=%s', self::$referenciaLocal) . PHP_EOL;
+        $transacaoFileSemTef .= 'param.formaPagamentoId=' . PHP_EOL;
+        $transacaoFileSemTef .= 'param.parcelamentoAdmin=false' . PHP_EOL;
+        $transacaoFileSemTef .= 'param.aguardarTefIniciarTransacao=false' . PHP_EOL;
+        $transacaoFileSemTef .= 'param.valorTotalVendido=12.0' . PHP_EOL;
+
+        \Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->put($pathReq, $transacaoFileSemTef);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathReq));
+
+        \Illuminate\Support\Facades\Artisan::call('controlpay-service:start', [
+            'minutes' => 6
+        ]);
+
+        $resultAsText = \Illuminate\Support\Facades\Artisan::output();
+        $this->assertEmpty($resultAsText);
+        $this->assertTrue(true);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathResp));
+
+        $file = new \SplFileObject(sprintf("%s/%s/%s",\App\Helpers\CPayFileHelper::getBaseDirectory(), \App\Helpers\CPayFileHelper::PATH_RESP, basename($pathResp)));
+
+        /**
+         * Valida atributos obrigatórios na resposta
+         */
+        $resultParams = [
+            'response.status' => null,
+            'response.message' => null,
+            'data.intencaoVenda.id' => null,
+            'data.intencaoVenda.token' => null,
+            'data.intencaoVenda.data' => null,
+            'data.intencaoVenda.valorOriginal' => null,
+            'data.intencaoVenda.terminal.id' => null,
+            'data.intencaoVenda.formaPagamento.id' => null,
+        ];
+
+        while (!$file->eof())
+        {
+            $row = $file->fgetcsv('=');
+
+            if(empty($row[0]) & empty($row[1]))
+                continue;
+
+            list($key, $value) = $row;
+
+            if(in_array($key, array_keys($resultParams)))
+                $resultParams[$key] = $value;
+        }
+
+        foreach ($resultParams as $key => $param)
+            $this->assertNotNull($param, sprintf("dado do atributo %s não foi encontrado na resposta", $key));
+
+        if(isset($resultParams['data.intencaoVenda.id']))
+            self::$intencaoVendaId = $resultParams['data.intencaoVenda.id'];
+
+    }
+
+    /**
      * Simula callback de resposta no controlpay
      */
     public function testTransacaoSemTefCallBack()
     {
-        $pathRespCallBack = sprintf("%s/callback_test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
+        $pathRespCallBack = sprintf("%s/callback_%s", \App\Helpers\CPayFileHelper::PATH_RESP, 'ststest_' . self::$referenciaLocal);
 
         $this->call('GET', '/v1/callbacks/controlpay/intencaovendacallback', [
             'intencaoVendaId' => self::$intencaoVendaId,
@@ -154,8 +278,8 @@ class DirectoryMonitorCommandTest extends TestCase
     public function testConsultaIntencaoVendaPorId()
     {
         self::$referenciaLocal .= '_cons_id';
-        $pathReq = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
-        $pathResp = sprintf("%s/test_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
+        $pathReq = sprintf("%s/sttest_%s", \App\Helpers\CPayFileHelper::PATH_REQ, self::$referenciaLocal);
+        $pathResp = sprintf("%s/sttest_%s", \App\Helpers\CPayFileHelper::PATH_RESP, self::$referenciaLocal);
 
         $consultaTransacaoFileSemTef = sprintf('identificador=%s', self::$user) . PHP_EOL;
         $consultaTransacaoFileSemTef .= sprintf('referencia=%s', self::$referenciaLocal) . PHP_EOL;

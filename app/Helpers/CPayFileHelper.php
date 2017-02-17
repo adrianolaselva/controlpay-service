@@ -90,22 +90,23 @@ class CPayFileHelper
         if(is_object($object))
             $array = SerializerHelper::toArray($object);
 
-        foreach ($array as $key => $value)
-        {
+        if(is_array($array))
+            foreach ($array as $key => $value)
+            {
 
-            if(is_array($value)){
-                foreach ($value as $keySub => $row){
-                    if(!is_string($row) && !is_integer($row))
-                        continue;
+                if(is_array($value)){
+                    foreach ($value as $keySub => $row){
+                        if(!is_string($row) && !is_integer($row))
+                            continue;
 
-                    $content .= sprintf("%s%s.%s=%s%s", $baseName, $key, $keySub, $row, PHP_EOL);
+                        $content .= sprintf("%s%s.%s=%s%s", $baseName, $key, $keySub, $row, PHP_EOL);
+                    }
+
+                    continue;
                 }
 
-                continue;
+                $content .= sprintf("%s%s=%s%s", $baseName, $key, $value, PHP_EOL);
             }
-
-            $content .= sprintf("%s%s=%s%s", $baseName, $key, $value, PHP_EOL);
-        }
 
         return $content;
     }
