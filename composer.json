@@ -1,6 +1,6 @@
 {
-    "name": "laravel/lumen",
-    "version": "0.1.2",
+    "name": "ntk-solutions/controlpay-service",
+    "version": "0.1.6",
     "description": "ControlPay service.",
     "keywords": ["framework", "laravel", "lumen"],
     "license": "MIT",

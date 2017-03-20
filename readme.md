@@ -374,7 +374,7 @@ Diretório de arquivos processados:
         param.intencaoVendaId=99999 <= (Obrigatório)
         
 **layout arquivo de response:**
-    
+        
         response.status=0
         response.message=Dados processados com sucesso
         data.intencaoVenda.id=99999
@@ -405,6 +405,9 @@ Diretório de arquivos processados:
         data.intencaoVenda.produtos.1.nome=Produto sem estoque/valor - refeição-41
         data.intencaoVenda.produtos.1.quantidade=1
         data.intencaoVenda.produtos.1.valor=18,80	
+
+
+**Obs: O arquivo de cancelamento sempre será o mesmo nome do arquivo de callback da transação original**
 
 ##Configurações
 

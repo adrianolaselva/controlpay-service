@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Integracao\ControlPay;
+use League\Flysystem\Exception;
 
 /**
  * Class DirectoryMonitorCommand
@@ -49,11 +50,13 @@ class DirectoryMonitorCommand extends Command
 
         $files = Storage::disk(env('STORAGE_CONFIG'))->files(CPayFileHelper::PATH_CONFIG);
 
-        foreach ($files as $file)
-        {
-            $params = parse_ini_string(Storage::disk(env('STORAGE_CONFIG'))->get($file));
-            $this->cPayclient[basename($file)] = new ControlPay\Client($params);
-        }
+        if(!is_null($files))
+            foreach ($files as $file)
+            {
+                $params = parse_ini_string(Storage::disk(env('STORAGE_CONFIG'))->get($file));
+                $this->cPayclient[basename($file)] = new ControlPay\Client($params);
+            }
+
     }
 
     /**
@@ -64,7 +67,7 @@ class DirectoryMonitorCommand extends Command
 
         $arguments = $this->arguments();
 
-        $minutes = $arguments['minutes'];
+        $minutes = isset($arguments['minutes']) ? $arguments['minutes'] : null;
 
         if(empty($minutes))
             $minutes = 60;
@@ -73,6 +76,7 @@ class DirectoryMonitorCommand extends Command
          * Adaptação para rodar command a cada 2 segundos
          */
         $inverval = 2;
+
         for($i = 0; $i < ceil($minutes/$inverval); $i++)
         {
             $this->readFiles();
@@ -119,6 +123,9 @@ class DirectoryMonitorCommand extends Command
                 if(!in_array($param, $requireParams))
                     throw new \Exception("Parâmetro '$param' não informado no arquivo!!");
 
+            if(!isset($this->cPayclient[$data['identificador']]))
+                throw new Exception(sprintf("Arquivo de configurações [conf/%s] não encontrado", $data['identificador']));
+
             if(!empty(File::where('name', basename($file))->first()))
                 throw new \Exception(sprintf("Arquivo nome %s já utilizada",
                     str_replace('.wrk', '', basename($file))));
@@ -140,6 +147,7 @@ class DirectoryMonitorCommand extends Command
             ]);
 
             $responseContent = null;
+
             switch (strtolower($data['api']))
             {
                 case CPayVender::API_VENDA_VENDER:
@@ -164,80 +172,9 @@ class DirectoryMonitorCommand extends Command
 
             CPayFileHelper::fileProccessed($file, $responseContent);
         }catch (\Exception $ex){
-            Log::info($ex->getMessage());
+            Log::error($ex->getMessage());
             CPayFileHelper::fileProccessedError($ex, $file);
         }
     }
-
-//    /**
-//     * @param $file
-//     * @param $responseContent
-//     */
-//    private function fileProccessed($file, $responseContent)
-//    {
-//        try{
-//            $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
-//            $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
-//
-//            Storage::disk(env('STORAGE_CONFIG'))->put(
-//                sprintf("%s/%s", CPayFileHelper::PATH_RESP, basename($file)),
-//                $responseStatus . $responseContent
-//            );
-//
-//            Storage::disk(env('STORAGE_CONFIG'))->move(
-//                $file,
-//                sprintf("%s/%s_%s", CPayFileHelper::PATH_PROCCESSED, date('Y-m-d_His'), basename($file))
-//            );
-//        }catch (\Exception $ex){
-//            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]', CPayFileHelper::PATH_REQ, basename($file), $ex->getMessage()));
-//        }
-//    }
-//
-//    /**
-//     * @param \Exception $ex
-//     * @param $file
-//     */
-//    private function fileProccessedError(\Exception $ex, $file)
-//    {
-//        try{
-//            $resposeContent = sprintf("response.status=%s%s", -1, PHP_EOL);
-//            $resposeContent .= sprintf("response.message=%s%s", $ex->getMessage(), PHP_EOL);
-//
-//            Storage::disk(env('STORAGE_CONFIG'))->put(
-//                sprintf("%s/%s", CPayFileHelper::PATH_RESP, basename($file)),
-//                $resposeContent
-//            );
-//
-//            Storage::disk(env('STORAGE_CONFIG'))->move(
-//                $file,
-//                sprintf("%s/%s_%s", CPayFileHelper::PATH_ERROR, date('Y-m-d_His'),basename($file))
-//            );
-//
-//        }catch (\Exception $ex){
-//            Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]', CPayFileHelper::PATH_REQ, basename($file), $ex->getMessage()));
-//        }
-//    }
-//
-//    /**
-//     * @param $file
-//     * @return array
-//     */
-//    private function loadFileContent($file)
-//    {
-//        $data = [];
-//
-//        try{
-//
-//            $data = CPayFileHelper::convertFileContentToArray(
-//                sprintf("%s/%s", Storage::disk(env('STORAGE_CONFIG'))->getAdapter()->getPathPrefix(), CPayFileHelper::PATH_REQ),
-//                basename($file)
-//            );
-//
-//        }catch (\Exception $ex){
-//            Log::error(sprintf('Falha ao processar arquivo %s/%s => [%s]', CPayFileHelper::PATH_REQ, basename($file)), $ex->getMessage());
-//        }
-//
-//        return $data;
-//    }
 
 }

@@ -273,6 +273,29 @@ class DirectoryMonitorCommandTest extends TestCase
     }
 
     /**
+     * Simula callback outro callback para verificar se o arquivo é realmente substituido sem erros
+     */
+    public function testTransacaoSemTefCallBack2()
+    {
+        $pathRespCallBack = sprintf("%s/callback_%s", \App\Helpers\CPayFileHelper::PATH_RESP, 'ststest_' . self::$referenciaLocal);
+
+        $this->call('GET', '/v1/callbacks/controlpay/intencaovendacallback', [
+            'intencaoVendaId' => self::$intencaoVendaId,
+            'intencaoVendaReferencia' => self::$referenciaLocal,
+            'pedidoId' => null,
+            'pedidoReferencia' => null
+        ]);
+
+        $this->assertJson($this->response->getContent());
+
+        $responseCallBack = json_decode($this->response->getContent(), true);
+
+        $this->assertEquals($responseCallBack['status'], 0);
+
+        $this->assertTrue(\Illuminate\Support\Facades\Storage::disk(env('STORAGE_CONFIG'))->exists($pathRespCallBack));
+    }
+
+    /**
      * Simula callback de resposta no controlpay
      */
     public function testConsultaIntencaoVendaPorId()

@@ -126,6 +126,9 @@ class CPayFileHelper
             $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
             $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($file))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($file);
+
             Storage::disk(env('STORAGE_CONFIG'))->put(
                 $file,
                 $responseStatus . $responseContent
@@ -150,6 +153,9 @@ class CPayFileHelper
 
             $fileWork = sprintf("%s.wrk", $file);
 
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileWork))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileWork);
+
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
                 $fileWork
@@ -172,6 +178,9 @@ class CPayFileHelper
                 return $file;
 
             $fileLock = sprintf("%s.lck", $file);
+
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileLock))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileLock);
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
@@ -213,9 +222,14 @@ class CPayFileHelper
             if(!self::fileIsWork($file))
                 return $file;
 
+            $fileUnlock = str_replace('.wrk', '', $file);
+
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileUnlock))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileUnlock);
+
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
-                str_replace('.wrk', '', $file)
+                $fileUnlock
             );
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
@@ -233,9 +247,14 @@ class CPayFileHelper
             if(!self::fileIsLock($file))
                 return $file;
 
+            $fileUnlock = str_replace('.lck', '', $file);
+
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileUnlock))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileUnlock);
+
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
-                str_replace('.lck', '', $file)
+                $fileUnlock
             );
         }catch (\Exception $ex){
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
@@ -260,11 +279,17 @@ class CPayFileHelper
             $responseStatus = sprintf("response.status=%s%s", 0, PHP_EOL);
             $responseStatus .= sprintf("response.message=%s%s", "Dados processados com sucesso", PHP_EOL);
 
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileResp))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileResp);
+
             Storage::disk(env('STORAGE_CONFIG'))->put(
                 $fileResp,
                 $responseStatus . $responseContent
             );
             self::fileUnWork($fileResp);
+
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileProcessed))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileProcessed);
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
@@ -294,11 +319,17 @@ class CPayFileHelper
             $resposeContent = sprintf("response.status=%s%s", -1, PHP_EOL);
             $resposeContent .= sprintf("response.message=%s%s", $ex->getMessage(), PHP_EOL);
 
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileResp))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileResp);
+
             Storage::disk(env('STORAGE_CONFIG'))->put(
                 $fileResp,
                 $resposeContent
             );
             self::fileUnWork($fileResp);
+
+            if(Storage::disk(env('STORAGE_CONFIG'))->exists($fileError))
+                Storage::disk(env('STORAGE_CONFIG'))->delete($fileError);
 
             Storage::disk(env('STORAGE_CONFIG'))->move(
                 $file,
@@ -307,7 +338,6 @@ class CPayFileHelper
             self::fileUnWork($fileError);
 
         }catch (\Exception $ex){
-            var_dump($ex->getMessage());
             Log::error(sprintf('Falha ao mover arquivo [%s/%s] => [%s]',
                 self::PATH_REQ, basename($file), $ex->getMessage()));
         }
