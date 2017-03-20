@@ -426,99 +426,9 @@ class CPayFileHelper
 
             return $responseContent;
         }catch (\Exception $ex){
-            var_dump($ex->getMessage());
             Log::error(sprintf("Falha ao exportar arquivo fn: [%s]", __FUNCTION__));
         }
     }
-
-//    /**
-//     * @param IntencaoVenda $intencaoVenda
-//     * @return null|string
-//     */
-//    public static function exportIntencaoVenda(IntencaoVenda $intencaoVenda, $prefix = 'data.intencaoVenda')
-//    {
-//        $responseContent = null;
-//
-//        try{
-//
-//            if(empty($intencaoVenda))
-//                throw new \Exception("Objeto vazio!");
-//
-//            $responseContent = self::convertObjectToFile(
-//                $intencaoVenda,
-//                "{$prefix}."
-//            );
-//
-//            if(!empty($intencaoVenda->getIntencaoVendaStatus()))
-//                $responseContent .= self::convertObjectToFile(
-//                    $intencaoVenda->getIntencaoVendaStatus(),
-//                    "{$prefix}.intencaoVendaStatus."
-//                );
-//
-//            if(!empty($intencaoVenda->getFormaPagamento()))
-//            {
-//                $responseContent .= self::convertObjectToFile(
-//                    $intencaoVenda->getFormaPagamento(),
-//                    "{$prefix}.formaPagamento."
-//                );
-//
-//                if(!empty($intencaoVenda->getFormaPagamento()->getFluxoPagamento()))
-//                    $responseContent .= self::convertObjectToFile(
-//                        $intencaoVenda->getFormaPagamento()->getFluxoPagamento(),
-//                        "{$prefix}.formaPagamento.fluxoPagamento."
-//                    );
-//            }
-//
-//
-//            if(!empty($intencaoVenda->getTerminal()))
-//                $responseContent .= self::convertObjectToFile(
-//                    $intencaoVenda->getTerminal(),
-//                    "{$prefix}.terminal."
-//                );
-//
-//            if(!empty($intencaoVenda->getPedido()))
-//                $responseContent .= self::convertObjectToFile(
-//                    $intencaoVenda->getPedido(),
-//                    "{$prefix}.pedido."
-//                );
-//
-//            if (!empty($intencaoVenda->getProdutos())) {
-//                foreach ($intencaoVenda->getProdutos() as $key => $produto) {
-//                    $responseContent .= self::convertObjectToFile(
-//                        $produto,
-//                        sprintf("%s.produtos.%s.", $prefix, $key)
-//                    );
-//                }
-//            }
-//
-//            if (!empty($intencaoVenda->getPagamentosExternos())) {
-//                foreach ($intencaoVenda->getPagamentosExternos() as $key => $pagamentosExterno) {
-//                    $responseContent .= self::convertObjectToFile(
-//                        $pagamentosExterno,
-//                        sprintf("%s.PagamentosExternos.%s.", $prefix, $key)
-//                    );
-//                }
-//            }
-//
-////            if (!empty($intencaoVenda->getPagamentosExternos())) {
-////                foreach ($intencaoVenda->getPagamentosExternos() as $pagamentoExterno) {
-////                    foreach ($pagamentoExterno->getComprovanteAdquirenteLinhas() as $key => $linha){
-////                        $responseContent .= sprintf(
-////                            "%s.PagamentosExternos.ComprovanteAdquirente.%s=%s%s",
-////                            $prefix,
-////                            $key,
-////                            $linha,
-////                            PHP_EOL
-////                        );
-////                    }
-////                }
-////            }
-//
-//            return $responseContent;
-//        }catch (\Exception $ex){
-//            Log::error(sprintf("Falha ao exportar arquivo fn: [%s]", __FUNCTION__));
-//        }
-//    }
 
     public static function getBaseDirectory()
     {
